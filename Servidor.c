@@ -20,7 +20,7 @@ int Registrarse (char usuario[20],char contrasena[20], char respuesta[100],MYSQL
 				mysql_errno(conn), mysql_error(conn));
 		exit (1);
 	}
-	//recogemos el resultado de la consulta 
+	//recogemos el resultado de la consulta
 	resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
 	if (row == NULL)
@@ -31,27 +31,27 @@ int Registrarse (char usuario[20],char contrasena[20], char respuesta[100],MYSQL
 			printf ("Error al consultar datos de la base %u %s\n",
 					mysql_errno(conn), mysql_error(conn));
 			exit (1);
-			//recogemos el resultado de la consulta 
+			//recogemos el resultado de la consulta
 		}
 		resultado = mysql_store_result (conn);
 		row = mysql_fetch_row (resultado);
-		if (row == NULL)
+		if (row ==  NULL)
 			printf ("No se han obtenido datos en la consulta\n");
 		else {
 			int ID = atoi (row[0]) +1;
 			printf("%d\n", ID);
 			char IDstr[3];
-			//convertimos la ID en un string y lo concatenamos 
+			//convertimos la ID en un string y lo concatenamos
 			sprintf(IDstr, "%d", ID);
 			// Ahora construimos el string con el comando SQL
 			// para insertar la persona en la base. Ese string es:
-			// INSERT INTO Jugador VALUES (ID, 'usuario', 'Contrasena'); 
+			// INSERT INTO Jugador VALUES (ID, 'usuario', 'Contrasena');
 			sprintf (consulta, "INSERT INTO Jugador VALUES ('%s','%s','%s')", IDstr, usuario, contrasena);
 			printf("%s\n", consulta);
-			// Ahora ya podemos realizar la insercion 
+			// Ahora ya podemos realizar la insercion
 			err = mysql_query(conn, consulta);
 			if (err!=0) {
-				printf ("Error al introducir datos la base %u %s\n", 
+				printf ("Error al introducir datos la base %u %s\n",
 						mysql_errno(conn), mysql_error(conn));
 				exit (1);
 			}
@@ -72,24 +72,24 @@ int Entrar (char usuario[20],char contrasena[20], char respuesta[100],MYSQL *con
 	MYSQL_ROW row;
 	char consulta[100];
 	sprintf (consulta, "SELECT Jugador.Usuario FROM Jugador WHERE Jugador.Usuario = '%s' AND Jugador.Contrasena = '%s'", usuario, contrasena);
-	//Consulta: Busca si existe el usuario y la contraseña
+	//Consulta: Busca si existe el usuario y la contraseï¿½a
 	int err=mysql_query (conn, consulta);
 	if (err!=0) {
 		printf ("Error al consultar datos de la base %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
 		exit (1);
 	}
-	//recogemos el resultado de la consulta 
+	//recogemos el resultado de la consulta
 		resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
 	if (row == NULL)
 	{
-		printf ("Datos de acceso inválidos\n");
+		printf ("Datos de acceso invï¿½lidos\n");
 		strcpy(respuesta, "1");
 		return 1;
 	}
 	else {
-		printf("%s ha iniciado sesión\n", row[0]);
+		printf("%s ha iniciado sesiï¿½n\n", row[0]);
 		strcpy(respuesta,"0");
 		return 0;
 	}
@@ -100,14 +100,14 @@ void Contrasena (char usuario[20], char respuesta[100],MYSQL *conn,int sock_conn
 	MYSQL_ROW row;
 	char consulta[100];
 	sprintf (consulta, "SELECT Jugador.Contrasena FROM Jugador WHERE Jugador.Usuario = '%s'", usuario);
-	//Consulta: Buscar la contraseña a partir del nombre de usuario
+	//Consulta: Buscar la contraseï¿½a a partir del nombre de usuario
 	int err=mysql_query (conn, consulta);
 	if (err!=0) {
 		printf ("Error al consultar datos de la base %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
 		exit (1);
 	}
-	//recogemos el resultado de la consulta 
+	//recogemos el resultado de la consulta
 	resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
 	if (row == NULL) {
@@ -132,7 +132,7 @@ void Jugadores (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
 				mysql_errno(conn), mysql_error(conn));
 		exit (1);
 	}
-	//recogemos el resultado de la consulta 
+	//recogemos el resultado de la consulta
 	resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
 	if (row == NULL) {
@@ -161,7 +161,7 @@ void Ganador (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
 				mysql_errno(conn), mysql_error(conn));
 		exit (1);
 	}
-	//recogemos el resultado de la consulta 
+	//recogemos el resultado de la consulta
 	resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
 	if (row == NULL) {
@@ -174,19 +174,19 @@ void Ganador (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
 	}
 }
 void Tiempo (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
-	//Procedimiento para devolver la duración de una partida
+	//Procedimiento para devolver la duraciï¿½n de una partida
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
 	char consulta[100];
 	sprintf (consulta, "SELECT Partida.Tiempo FROM Partida WHERE Partida.ID = '%d'", partida);
-	//Consulta: Buscar la duración de una partida a partir del identificador
+	//Consulta: Buscar la duraciï¿½n de una partida a partir del identificador
 	int err=mysql_query (conn, consulta);
 	if (err!=0) {
 		printf ("Error al consultar datos de la base %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
 		exit (1);
 	}
-	//recogemos el resultado de la consulta 
+	//recogemos el resultado de la consulta
 	resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
 	if (row == NULL) {
@@ -200,17 +200,17 @@ void Tiempo (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
 	}
 }
 void Rapido (char respuesta[100],MYSQL *conn,int sock_conn){
-	//Procedimiento para devolver el ganador mas rápido de una partida
+	//Procedimiento para devolver el ganador mas rï¿½pido de una partida
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
-	//Consulta: Buscar la jugador que ha ganada más rápido
+	//Consulta: Buscar la jugador que ha ganada mï¿½s rï¿½pido
 	int err=mysql_query (conn, "SELECT Partida.Ganador FROM Partida WHERE Partida.Tiempo = (SELECT MIN(Partida.Tiempo) FROM Partida)");
 	if (err!=0) {
 		printf ("Error al consultar datos de la base %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
 		exit (1);
 	}
-	//recogemos el resultado de la consulta 
+	//recogemos el resultado de la consulta
 	resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
 	if (row == NULL) {
@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
 	// Fem el bind al port
 	memset(&serv_adr, 0, sizeof(serv_adr));// inicialitza a zero serv_addr
 	serv_adr.sin_family = AF_INET;
-	// asocia el socket a cualquiera de las IP de la m?quina. 
+	// asocia el socket a cualquiera de las IP de la m?quina.
 	//htonl formatea el numero que recibe al formato necesario
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	// establecemos el puerto de escucha
@@ -246,11 +246,11 @@ int main(int argc, char *argv[])
 	//La cola de peticiones pendientes no podr? ser superior a 3
 	if (listen(sock_listen, 3) < 0)
 		printf("Error en el Listen");
-	
+
 	//MYSQL
 	MYSQL *conn;
 	int err;
-	//Creamos una conexion al servidor MYSQL 
+	//Creamos una conexion al servidor MYSQL
 	conn = mysql_init(NULL);
 	if (conn==NULL) {
 		printf ("Error al crear la conexion: %u %s\n",
@@ -264,15 +264,15 @@ int main(int argc, char *argv[])
 				mysql_errno(conn), mysql_error(conn));
 		exit (1);
 	}
-	
+
 	// Bucle infinito
 	for (;;){
 		printf ("Escuchando\n");
-		
+
 		sock_conn = accept(sock_listen, NULL, NULL);
 		printf ("He recibido conexion\n");
 		//sock_conn es el socket que usaremos para este cliente
-		
+
 		int terminar =0;
 		// Entramos en un bucle para atender todas las peticiones de este cliente
 		//hasta que se desconecte
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
 			// Ahora recibimos la peticion
 			ret=read(sock_conn,peticion, sizeof(peticion));
 			printf ("Recibido\n");
-			// Tenemos que añadirle la marca de fin de string 
+			// Tenemos que aï¿½adirle la marca de fin de string
 			// para que no escriba lo que hay despues en el buffer
 			peticion[ret]='\0';
 			printf ("Peticion: %s\n", peticion);
@@ -290,17 +290,17 @@ int main(int argc, char *argv[])
 			int codigo =  atoi (p);
 			// Ya tenemos el codigo de la peticion
 			printf ("Codigo: %d\n", codigo);
-			
+
 			if (codigo !=0)
 				p = strtok( NULL, "/");
 			char usuario[20];
 			char contrasena[20];
 			int partida;
-			
+
 			if (codigo ==0) //Peticion de Desconexion
 				terminar=1;
 			else if (codigo ==1) //Peticion de Registro
-			{	
+			{
 				strcpy (usuario, p);
 				p = strtok( NULL, "/");
 				strcpy (contrasena, p);
@@ -313,16 +313,16 @@ int main(int argc, char *argv[])
 				strcpy (contrasena, p);
 				Entrar(usuario,contrasena,respuesta,conn,sock_conn);
 			}
-			else if (codigo ==3) //Peticion de Contraseña
+			else if (codigo ==3) //Peticion de Contraseï¿½a
 			{
 				strcpy (usuario, p);
 				Contrasena(usuario,respuesta,conn,sock_conn);
-			}		
+			}
 			else if (codigo ==4) //Peticion de Jugadores
 			{
 				partida = atoi (p);
 				Jugadores(partida,respuesta,conn,sock_conn);
-			}	
+			}
 			else if (codigo ==5) //Peticion de Ganador
 			{
 				partida = atoi (p);
@@ -333,13 +333,13 @@ int main(int argc, char *argv[])
 				partida = atoi (p);
 				Tiempo(partida,respuesta,conn,sock_conn);
 			}
-			else if (codigo ==7) //Peticion de ganador más rápido
+			else if (codigo ==7) //Peticion de ganador mï¿½s rï¿½pido
 			{
 				Rapido(respuesta,conn,sock_conn);
 			}
 			else
-				strcpy (respuesta,"Código de petición no válido");
-				
+				strcpy (respuesta,"Cï¿½digo de peticiï¿½n no vï¿½lido");
+
 			if (codigo !=0)
 			{
 				// Enviamos respuesta
@@ -350,6 +350,6 @@ int main(int argc, char *argv[])
 		mysql_close (conn);
 		exit(0);
 		//Se acabo el servicio para este cliente
-		close(sock_conn); 
-	}	
+		close(sock_conn);
+	}
 }
