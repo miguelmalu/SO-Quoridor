@@ -1,0 +1,51 @@
+DROP DATABASE IF EXISTS BD;
+CREATE DATABASE BD;
+USE BD;
+
+CREATE TABLE Jugador(
+   ID INT NOT NULL,
+   Usuario VARCHAR(50) NOT NULL, 
+   Contrasena VARCHAR(50),
+   PRIMARY KEY (ID) 
+)ENGINE=InnoDB;
+
+CREATE TABLE Partida(
+   ID INT NOT NULL,
+   Fecha VARCHAR(50),
+   Tiempo INT,
+   Ganador VARCHAR(50),
+   PRIMARY KEY(ID)
+)ENGINE=InnoDB;
+
+CREATE TABLE Jugadores(
+   ID_J INT NOT NULL,
+   ID_P INT NOT NULL,
+   FOREIGN KEY (ID_J) REFERENCES Jugador(ID),
+   FOREIGN KEY (ID_P) REFERENCES Partida(ID)
+)ENGINE=InnoDB;
+
+INSERT INTO Jugador VALUES (1, 'Esther', 'vreww5');
+INSERT INTO Jugador VALUES (2, 'Freddy', '342tf34w');
+INSERT INTO Jugador VALUES (3, 'Maria', 'f43gqw45');
+INSERT INTO Jugador VALUES (4, 'Miguel', '854b98m');
+
+INSERT INTO Partida VALUES (1, '11/03/2021-09:00', 17, 'Miguel');
+INSERT INTO Partida VALUES (2, '11/03/2021-09:30', 12, 'Maria');
+INSERT INTO Partida VALUES (3, '11/03/2021-10:00', 22, 'Esther');
+INSERT INTO Partida VALUES (4, '11/03/2021-10:00', 28, 'Freddy');
+
+INSERT INTO Jugadores VALUES (2, 1);
+INSERT INTO Jugadores VALUES (4, 1);
+INSERT INTO Jugadores VALUES (1, 2);
+INSERT INTO Jugadores VALUES (3, 2);
+INSERT INTO Jugadores VALUES (1, 3);
+INSERT INTO Jugadores VALUES (2, 3);
+INSERT INTO Jugadores VALUES (3, 3);
+INSERT INTO Jugadores VALUES (1, 4);
+INSERT INTO Jugadores VALUES (2, 4);
+INSERT INTO Jugadores VALUES (3, 4);
+INSERT INTO Jugadores VALUES (4, 4);
+
+SELECT * FROM Jugador;
+SELECT * FROM Partida;
+SELECT * FROM Jugadores;
