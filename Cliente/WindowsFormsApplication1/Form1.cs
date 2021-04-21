@@ -24,18 +24,23 @@ namespace WindowsFormsApplication1
             //Creamos un IPEndPoint con el ip del servidor y puerto del servidor 
             //al que deseamos conectarnos
             IPAddress direc = IPAddress.Parse("192.168.56.102");
-            IPEndPoint ipep = new IPEndPoint(direc, 9000);
+            IPEndPoint ipep = new IPEndPoint(direc, 9020);
             //Creamos el socket 
             server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
             {
                 server.Connect(ipep);//Intentamos conectar el socket
-                this.BackColor = Color.Green;
-                MessageBox.Show("Conectado");
+                if (this.BackColor == Color.Green)
+                    MessageBox.Show("Ya estás conectado");
+                else {
+                    this.BackColor = Color.Green;
+                    MessageBox.Show("Conectado");
+                }
             }
             catch (SocketException)
             {
                 //Si hay excepcion imprimimos error y salimos del programa con return 
+                this.BackColor = Color.Gray;
                 MessageBox.Show("Error en la conexión con el servidor");
                 return;
             }
@@ -52,8 +57,9 @@ namespace WindowsFormsApplication1
                 server.Send(msg);
                 //Nos desconectamos
                 this.BackColor = Color.Gray;
+                MessageBox.Show("Desconectado");
                 server.Shutdown(SocketShutdown.Both);
-                server.Close();
+                server.Close();  
             }
             catch (Exception)
             {
@@ -80,8 +86,10 @@ namespace WindowsFormsApplication1
                     mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
                     if (mensaje == "0")
                         MessageBox.Show(UsuarioBox.Text + " se ha registrado correctamente");
-                    else
+                    else if (mensaje == "-1")
                         MessageBox.Show(UsuarioBox.Text + " ya está en uso");
+                    else if (mensaje == "-2")
+                        MessageBox.Show("El nombre de usuario es muy largo");
                 }
                 else
                     MessageBox.Show("Error en los campos de los datos");
@@ -111,7 +119,13 @@ namespace WindowsFormsApplication1
                     mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
                     if (mensaje == "0")
                         MessageBox.Show("Has iniciado sesión como " + UsuarioBox.Text);
-                    else
+                    else if (mensaje == "1")
+                        MessageBox.Show("Ya habías iniciado sesión como " + UsuarioBox.Text + " en este cliente");
+                    else if (mensaje == "2")
+                        MessageBox.Show("Ya habías iniciado sesión como " + UsuarioBox.Text + " en otro cliente");
+                    else if (mensaje == "-1")
+                        MessageBox.Show("No se ha podido iniciar sesión, la lista de conectados está llena");
+                    else if (mensaje == "-2")
                         MessageBox.Show("Datos de acceso inválidos");
                 }
                 else
@@ -245,5 +259,33 @@ namespace WindowsFormsApplication1
                 return;
             }
         }
+
+        private void Conectados_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //Conectados
+                string mensaje = "8/";
+                // Enviamos al servidor la consulta
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+                //Recibimos la respuesta del servidor
+                byte[] msg2 = new byte[80];
+                server.Receive(msg2);
+                mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
+                string[] conectados = mensaje.Split('/');
+                ConectadosGrid.ColumnCount = 1;
+                ConectadosGrid.RowCount = conectados.Length-1;
+                for (int i = 1; i < conectados.Length; i++)
+                    ConectadosGrid.Rows[i-1].Cells[0].Value = conectados[i];
+            }
+            catch (Exception)
+            {
+                //Si hay excepcion imprimimos error y salimos del programa con return 
+                MessageBox.Show("Error en la petición");
+                return;
+            }
+        }
+
     }
 }

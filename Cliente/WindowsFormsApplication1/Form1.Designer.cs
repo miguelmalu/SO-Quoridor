@@ -47,9 +47,14 @@
             this.Rápido = new System.Windows.Forms.RadioButton();
             this.Tiempo = new System.Windows.Forms.RadioButton();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.ConectadosGrid = new System.Windows.Forms.DataGridView();
+            this.Conectados = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ConectadosGrid)).BeginInit();
             this.SuspendLayout();
             // 
             // label2
@@ -268,11 +273,48 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Datos";
             // 
+            // groupBox4
+            // 
+            this.groupBox4.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.groupBox4.Controls.Add(this.ConectadosGrid);
+            this.groupBox4.Controls.Add(this.Conectados);
+            this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox4.Location = new System.Drawing.Point(254, 46);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(194, 208);
+            this.groupBox4.TabIndex = 12;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Lista Conectados";
+            // 
+            // ConectadosGrid
+            // 
+            this.ConectadosGrid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.ConectadosGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ConectadosGrid.ColumnHeadersVisible = false;
+            this.ConectadosGrid.Location = new System.Drawing.Point(16, 21);
+            this.ConectadosGrid.Name = "ConectadosGrid";
+            this.ConectadosGrid.RowHeadersVisible = false;
+            this.ConectadosGrid.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this.ConectadosGrid.Size = new System.Drawing.Size(161, 150);
+            this.ConectadosGrid.TabIndex = 11;
+            // 
+            // Conectados
+            // 
+            this.Conectados.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Conectados.Location = new System.Drawing.Point(62, 177);
+            this.Conectados.Name = "Conectados";
+            this.Conectados.Size = new System.Drawing.Size(75, 23);
+            this.Conectados.TabIndex = 10;
+            this.Conectados.Text = "Actualizar";
+            this.Conectados.UseVisualStyleBackColor = true;
+            this.Conectados.Click += new System.EventHandler(this.Conectados_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(272, 474);
+            this.ClientSize = new System.Drawing.Size(514, 474);
+            this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.Desconectar);
@@ -286,6 +328,8 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ConectadosGrid)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -311,6 +355,9 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.RadioButton Tiempo;
         private System.Windows.Forms.RadioButton Rápido;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.Button Conectados;
+        private System.Windows.Forms.DataGridView ConectadosGrid;
     }
 }
 
