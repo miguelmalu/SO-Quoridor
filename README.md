@@ -14,3 +14,4 @@
 	Lista de conectados como notificación
 - **Generada** por Esther  
 - **Verificada** por Maria y Miguel  
+- [**Comunicada** por Freddy](https://www.dropbox.com/s/z0o1641l3eho74e/2021-04-28%2023-18-48.mkv?dl=0)  
