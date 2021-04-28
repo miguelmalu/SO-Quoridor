@@ -13,3 +13,4 @@
 ### Versión 3
 	Lista de conectados como notificación
 - **Generada** por Esther  
+- **Verificada** por Maria  
