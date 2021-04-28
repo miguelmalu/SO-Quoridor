@@ -8,23 +8,116 @@ using System.Text;
 using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace WindowsFormsApplication1
 {
     public partial class Form1 : Form
     {
         Socket server;
+        Thread atender;
+
         public Form1()
         {
             InitializeComponent();
+            CheckForIllegalCrossThreadCalls = false; //Necesario para que los elementos de los formularios puedan ser
+            //accedidos desde threads diferentes a los que los crearon
+        }
+
+        private void AtenderServidor()
+        {
+            while (true)
+            {
+                //Recibimos mensaje del servidor
+                byte[] msg2 = new byte[80];
+                server.Receive(msg2);
+                string[] trozos = Encoding.ASCII.GetString(msg2).Split('/');
+                int codigo = Convert.ToInt32(trozos[0]);
+                string mensaje = trozos[1].Split('\0')[0];
+
+                switch (codigo)
+                {
+                    case 1: //Registro
+                        if (mensaje == "0")
+                            MessageBox.Show(UsuarioBox.Text + " se ha registrado correctamente");
+                        else if (mensaje == "-1")
+                            MessageBox.Show(UsuarioBox.Text + " ya está en uso");
+                        else if (mensaje == "-2")
+                            MessageBox.Show("El nombre de usuario es muy largo");
+                        break;
+                    case 2: //Login
+                        if (mensaje == "0")
+                            MessageBox.Show("Has iniciado sesión como " + UsuarioBox.Text);
+                        else if (mensaje == "1")
+                            MessageBox.Show("Ya habías iniciado sesión como " + UsuarioBox.Text + " en este cliente");
+                        else if (mensaje == "2")
+                            MessageBox.Show("Ya habías iniciado sesión como " + UsuarioBox.Text + " en otro cliente");
+                        else if (mensaje == "-1")
+                            MessageBox.Show("No se ha podido iniciar sesión, la lista de conectados está llena");
+                        else if (mensaje == "-2")
+                            MessageBox.Show("En este cliente ya se había iniciado sesión con otro usuario");
+                        else if (mensaje == "-3")
+                            MessageBox.Show("Datos de acceso inválidos");
+                        break;
+                    case 3: //Contraseña del usuario
+                        if (mensaje != "fail")
+                            MessageBox.Show("Tu contraseña es: " + mensaje);
+                        else
+                            MessageBox.Show("No se ha encontrado el usuario");
+                        break;
+                    case 4: //Jugadores de la partida
+                        if (mensaje != "fail")
+                        {
+                            string jugadores = "Los jugadores en esta partida son: ";
+                            for (int i = 1; i < (trozos.Length - 1); i++)
+                                jugadores = jugadores + trozos[i] + ", ";
+                            jugadores = jugadores.Remove(jugadores.Length - 2);
+                            MessageBox.Show(jugadores);
+                        }
+                        else
+                            MessageBox.Show("No se ha encontrado la partida");
+                        break;
+                    case 5: //Ganador de la partida
+                        if (mensaje != "fail")
+                            MessageBox.Show("El ganador de la partida es: " + mensaje);
+                        else
+                            MessageBox.Show("No se ha encontrado la partida");
+                        break;
+                    case 6: //Duración de la partida
+                        int tiempo = Convert.ToInt32(mensaje);
+                        if (mensaje != "fail")
+                            MessageBox.Show("La duración de la partida es de: " + tiempo + " minutos");
+                        else
+                            MessageBox.Show("No se ha encontrado la partida");
+                        break;
+                    case 7: //Ganador más rápido
+                        if (mensaje != "fail")
+                            MessageBox.Show("El ganador más rápdio es: " + mensaje);
+                        else
+                            MessageBox.Show("No se han obtenido datos en la consulta");
+                        break;
+                    case 8: //Notificación de Lista de Conectados
+                        int numero = Convert.ToInt32(mensaje);
+                        if (numero != 0)
+                        {
+                            ConectadosGrid.ColumnCount = 1;
+                            ConectadosGrid.RowCount = numero;
+                            for (int i = 2; i < trozos.Length; i++)
+                                ConectadosGrid.Rows[i - 2].Cells[0].Value = trozos[i];
+                        }
+                        break;
+                }
+            }
         }
 
         private void Conectar_Click(object sender, EventArgs e)
         {
             //Creamos un IPEndPoint con el ip del servidor y puerto del servidor 
             //al que deseamos conectarnos
-            IPAddress direc = IPAddress.Parse("192.168.56.102");
-            IPEndPoint ipep = new IPEndPoint(direc, 9020);
+            //IPAddress direc = IPAddress.Parse("192.168.56.102"); //Entorno Desarrollo
+            //IPEndPoint ipep = new IPEndPoint(direc, 9080); //Entorno Desarrollo
+            IPAddress direc = IPAddress.Parse("147.83.117.22"); //Entorno Producción
+            IPEndPoint ipep = new IPEndPoint(direc, 50058); //Entorno Producción
             //Creamos el socket 
             server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
@@ -35,7 +128,13 @@ namespace WindowsFormsApplication1
                 else {
                     this.BackColor = Color.Green;
                     MessageBox.Show("Conectado");
+                    ConectadosGrid.Columns.Clear();
+                    ConectadosGrid.Rows.Clear();
                 }
+                //Pongo en marcha el thread que atenderá los mensajes del servidor
+                ThreadStart ts = delegate { AtenderServidor(); };
+                atender = new Thread(ts);
+                atender.Start();
             }
             catch (SocketException)
             {
@@ -56,6 +155,7 @@ namespace WindowsFormsApplication1
                 byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                 server.Send(msg);
                 //Nos desconectamos
+                atender.Abort();
                 this.BackColor = Color.Gray;
                 MessageBox.Show("Desconectado");
                 server.Shutdown(SocketShutdown.Both);
@@ -69,6 +169,14 @@ namespace WindowsFormsApplication1
             } 
         }
 
+        private void PassCheckBox_Check(object sender, EventArgs e)
+        {
+            if (PassCheckBox.Checked)
+                ContraseñaBox.UseSystemPasswordChar = false;
+            else
+                ContraseñaBox.UseSystemPasswordChar = true;
+        }
+
         private void Registrarse_Click(object sender, EventArgs e)
         {
             try
@@ -80,16 +188,6 @@ namespace WindowsFormsApplication1
                     // Enviamos al servidor la consulta
                     byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                     server.Send(msg);
-                    //Recibimos la respuesta del servidor
-                    byte[] msg2 = new byte[80];
-                    server.Receive(msg2);
-                    mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-                    if (mensaje == "0")
-                        MessageBox.Show(UsuarioBox.Text + " se ha registrado correctamente");
-                    else if (mensaje == "-1")
-                        MessageBox.Show(UsuarioBox.Text + " ya está en uso");
-                    else if (mensaje == "-2")
-                        MessageBox.Show("El nombre de usuario es muy largo");
                 }
                 else
                     MessageBox.Show("Error en los campos de los datos");
@@ -113,20 +211,6 @@ namespace WindowsFormsApplication1
                     // Enviamos al servidor la consulta
                     byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                     server.Send(msg);
-                    //Recibimos la respuesta del servidor
-                    byte[] msg2 = new byte[80];
-                    server.Receive(msg2);
-                    mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-                    if (mensaje == "0")
-                        MessageBox.Show("Has iniciado sesión como " + UsuarioBox.Text);
-                    else if (mensaje == "1")
-                        MessageBox.Show("Ya habías iniciado sesión como " + UsuarioBox.Text + " en este cliente");
-                    else if (mensaje == "2")
-                        MessageBox.Show("Ya habías iniciado sesión como " + UsuarioBox.Text + " en otro cliente");
-                    else if (mensaje == "-1")
-                        MessageBox.Show("No se ha podido iniciar sesión, la lista de conectados está llena");
-                    else if (mensaje == "-2")
-                        MessageBox.Show("Datos de acceso inválidos");
                 }
                 else
                     MessageBox.Show("Error en los campos de los datos de Acceso");
@@ -152,14 +236,6 @@ namespace WindowsFormsApplication1
                         // Enviamos al servidor la consulta
                         byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                         server.Send(msg);
-                        //Recibimos la respuesta del servidor
-                        byte[] msg2 = new byte[80];
-                        server.Receive(msg2);
-                        mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-                        if (mensaje != "fail")
-                            MessageBox.Show("Tu contraseña es: " + mensaje);
-                        else
-                            MessageBox.Show("No se ha encontrado el usuario");
                     }
                     else
                         MessageBox.Show("Error en el campo de datos: Usuario");
@@ -173,21 +249,6 @@ namespace WindowsFormsApplication1
                         // Enviamos al servidor la consulta
                         byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                         server.Send(msg);
-                        //Recibimos la respuesta del servidor
-                        byte[] msg2 = new byte[80];
-                        server.Receive(msg2);
-                        mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-                        if (mensaje != "fail")
-                        {
-                            string[] jugador = mensaje.Split('/');
-                            string jugadores = "Los jugadores en esta partida son: ";
-                            for (int i = 0; i < (jugador.Length - 1); i++)
-                                jugadores = jugadores + jugador[i] + ", ";
-                            jugadores = jugadores.Remove(jugadores.Length - 2);
-                            MessageBox.Show(jugadores);
-                        }
-                        else
-                            MessageBox.Show("No se ha encontrado la partida");
                     }
                     else
                         MessageBox.Show("Error en el campo de datos: Partida");
@@ -201,14 +262,6 @@ namespace WindowsFormsApplication1
                         // Enviamos al servidor la consulta
                         byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                         server.Send(msg);
-                        //Recibimos la respuesta del servidor
-                        byte[] msg2 = new byte[80];
-                        server.Receive(msg2);
-                        mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-                        if (mensaje != "fail")
-                            MessageBox.Show("El ganador de la partida es: " + mensaje);
-                        else
-                            MessageBox.Show("No se ha encontrado la partida");
                     }
                     else
                         MessageBox.Show("Error en el campo de datos: Partida");
@@ -222,15 +275,6 @@ namespace WindowsFormsApplication1
                         // Enviamos al servidor la consulta
                         byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                         server.Send(msg);
-                        //Recibimos la respuesta del servidor
-                        byte[] msg2 = new byte[80];
-                        server.Receive(msg2);
-                        mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-                        int tiempo = Convert.ToInt32(mensaje);
-                        if (mensaje != "fail")
-                            MessageBox.Show("La duración de la partida es de: " + tiempo + " minutos");
-                        else
-                            MessageBox.Show("No se ha encontrado la partida");
                     }
                     else
                         MessageBox.Show("Error en el campo de datos: Partida");
@@ -242,14 +286,6 @@ namespace WindowsFormsApplication1
                     // Enviamos al servidor la consulta
                     byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                     server.Send(msg);
-                    //Recibimos la respuesta del servidor
-                    byte[] msg2 = new byte[80];
-                    server.Receive(msg2);
-                    mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-                    if (mensaje != "fail")
-                        MessageBox.Show("El ganador más rápdio es: " + mensaje);
-                    else
-                        MessageBox.Show("No se han obtenido datos en la consulta");
                 }
             }
             catch (Exception)
@@ -259,33 +295,5 @@ namespace WindowsFormsApplication1
                 return;
             }
         }
-
-        private void Conectados_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                //Conectados
-                string mensaje = "8/";
-                // Enviamos al servidor la consulta
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-                server.Send(msg);
-                //Recibimos la respuesta del servidor
-                byte[] msg2 = new byte[80];
-                server.Receive(msg2);
-                mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-                string[] conectados = mensaje.Split('/');
-                ConectadosGrid.ColumnCount = 1;
-                ConectadosGrid.RowCount = conectados.Length-1;
-                for (int i = 1; i < conectados.Length; i++)
-                    ConectadosGrid.Rows[i-1].Cells[0].Value = conectados[i];
-            }
-            catch (Exception)
-            {
-                //Si hay excepcion imprimimos error y salimos del programa con return 
-                MessageBox.Show("Error en la petición");
-                return;
-            }
-        }
-
     }
 }

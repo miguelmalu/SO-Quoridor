@@ -49,7 +49,7 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.ConectadosGrid = new System.Windows.Forms.DataGridView();
-            this.Conectados = new System.Windows.Forms.Button();
+            this.PassCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -89,7 +89,7 @@
             // Consultar
             // 
             this.Consultar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Consultar.Location = new System.Drawing.Point(80, 159);
+            this.Consultar.Location = new System.Drawing.Point(80, 154);
             this.Consultar.Name = "Consultar";
             this.Consultar.Size = new System.Drawing.Size(75, 23);
             this.Consultar.TabIndex = 5;
@@ -99,7 +99,8 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.groupBox1.BackColor = System.Drawing.Color.Silver;
+            this.groupBox1.Controls.Add(this.PassCheckBox);
             this.groupBox1.Controls.Add(this.Entrar);
             this.groupBox1.Controls.Add(this.Registrarse);
             this.groupBox1.Controls.Add(this.ContraseñaBox);
@@ -109,7 +110,7 @@
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(23, 46);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(225, 138);
+            this.groupBox1.Size = new System.Drawing.Size(225, 160);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Acceso";
@@ -117,7 +118,7 @@
             // Entrar
             // 
             this.Entrar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Entrar.Location = new System.Drawing.Point(119, 103);
+            this.Entrar.Location = new System.Drawing.Point(116, 128);
             this.Entrar.Name = "Entrar";
             this.Entrar.Size = new System.Drawing.Size(75, 23);
             this.Entrar.TabIndex = 11;
@@ -128,7 +129,7 @@
             // Registrarse
             // 
             this.Registrarse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Registrarse.Location = new System.Drawing.Point(38, 103);
+            this.Registrarse.Location = new System.Drawing.Point(35, 128);
             this.Registrarse.Name = "Registrarse";
             this.Registrarse.Size = new System.Drawing.Size(75, 23);
             this.Registrarse.TabIndex = 10;
@@ -143,6 +144,7 @@
             this.ContraseñaBox.Name = "ContraseñaBox";
             this.ContraseñaBox.Size = new System.Drawing.Size(120, 20);
             this.ContraseñaBox.TabIndex = 5;
+            this.ContraseñaBox.UseSystemPasswordChar = true;
             // 
             // label1
             // 
@@ -221,7 +223,7 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.groupBox2.BackColor = System.Drawing.Color.Silver;
             this.groupBox2.Controls.Add(this.Rápido);
             this.groupBox2.Controls.Add(this.Tiempo);
             this.groupBox2.Controls.Add(this.Jugadores);
@@ -229,9 +231,9 @@
             this.groupBox2.Controls.Add(this.Consultar);
             this.groupBox2.Controls.Add(this.Ganador);
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox2.Location = new System.Drawing.Point(23, 260);
+            this.groupBox2.Location = new System.Drawing.Point(23, 282);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(225, 194);
+            this.groupBox2.Size = new System.Drawing.Size(225, 187);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Petición";
@@ -262,11 +264,11 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.groupBox3.BackColor = System.Drawing.Color.Silver;
             this.groupBox3.Controls.Add(this.label3);
             this.groupBox3.Controls.Add(this.PartidaBox);
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox3.Location = new System.Drawing.Point(23, 190);
+            this.groupBox3.Location = new System.Drawing.Point(23, 212);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(225, 64);
             this.groupBox3.TabIndex = 14;
@@ -275,45 +277,50 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.groupBox4.BackColor = System.Drawing.Color.Silver;
             this.groupBox4.Controls.Add(this.ConectadosGrid);
-            this.groupBox4.Controls.Add(this.Conectados);
             this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox4.Location = new System.Drawing.Point(254, 46);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(194, 208);
+            this.groupBox4.Size = new System.Drawing.Size(194, 423);
             this.groupBox4.TabIndex = 12;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Lista Conectados";
             // 
             // ConectadosGrid
             // 
+            this.ConectadosGrid.AllowUserToResizeColumns = false;
+            this.ConectadosGrid.AllowUserToResizeRows = false;
             this.ConectadosGrid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.ConectadosGrid.BackgroundColor = System.Drawing.Color.Silver;
+            this.ConectadosGrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ConectadosGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ConectadosGrid.ColumnHeadersVisible = false;
-            this.ConectadosGrid.Location = new System.Drawing.Point(16, 21);
+            this.ConectadosGrid.Location = new System.Drawing.Point(15, 33);
             this.ConectadosGrid.Name = "ConectadosGrid";
+            this.ConectadosGrid.ReadOnly = true;
             this.ConectadosGrid.RowHeadersVisible = false;
             this.ConectadosGrid.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this.ConectadosGrid.Size = new System.Drawing.Size(161, 150);
+            this.ConectadosGrid.Size = new System.Drawing.Size(161, 363);
             this.ConectadosGrid.TabIndex = 11;
             // 
-            // Conectados
+            // PassCheckBox
             // 
-            this.Conectados.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Conectados.Location = new System.Drawing.Point(62, 177);
-            this.Conectados.Name = "Conectados";
-            this.Conectados.Size = new System.Drawing.Size(75, 23);
-            this.Conectados.TabIndex = 10;
-            this.Conectados.Text = "Actualizar";
-            this.Conectados.UseVisualStyleBackColor = true;
-            this.Conectados.Click += new System.EventHandler(this.Conectados_Click);
+            this.PassCheckBox.AutoSize = true;
+            this.PassCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.PassCheckBox.Location = new System.Drawing.Point(60, 99);
+            this.PassCheckBox.Name = "PassCheckBox";
+            this.PassCheckBox.Size = new System.Drawing.Size(122, 17);
+            this.PassCheckBox.TabIndex = 12;
+            this.PassCheckBox.Text = "Mostrar constraseña";
+            this.PassCheckBox.UseVisualStyleBackColor = true;
+            this.PassCheckBox.CheckedChanged += new System.EventHandler(this.PassCheckBox_Check);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(514, 474);
+            this.ClientSize = new System.Drawing.Size(473, 490);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
@@ -356,8 +363,8 @@
         private System.Windows.Forms.RadioButton Tiempo;
         private System.Windows.Forms.RadioButton Rápido;
         private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.Button Conectados;
         private System.Windows.Forms.DataGridView ConectadosGrid;
+        private System.Windows.Forms.CheckBox PassCheckBox;
     }
 }
 

@@ -10,3 +10,6 @@
 - **Generada** por Maria  
 - **Verificada** por Esther y Freddy  
 - [**Comunicada** por Miguel](https://drive.google.com/file/d/1Orj-luzA13rkY9JJBBvZ-V3FJI1Jk5MD/view?usp=sharing)
+### Versión 3
+	Lista de conectados como notificación
+- **Generada** por Esther  

@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <mysql.h>
 #include <pthread.h>
+#include <my_global.h> //Solo para BD en Entorno Producción
 
 //ESTRUCTURAS PARA LA LISTA DE CONECTADOS
 typedef struct {
@@ -101,11 +102,15 @@ void DameConectados (ListaConectados *lista, char conectados[300]) {
 		sprintf (conectados, "%s/%s", conectados, lista->conectados[i].nombre);
 }
 
+int i=0;
+int sockets[100];
+
 //Estructura necesaria para acceso excluyente
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void *AtenderCliente (void *socket) {
 	int sock_conn = * (int *) socket;
+	printf ("Socket: %d\n", sock_conn);
 	
 	char peticion[512];
 	char respuesta[512];
@@ -122,7 +127,8 @@ void *AtenderCliente (void *socket) {
 		exit (1);
 	}
 	//inicializar la conexion
-	conn = mysql_real_connect (conn, "localhost","root", "mysql", "BD",0, NULL, 0);
+	//conn = mysql_real_connect (conn, "localhost","root", "mysql", "M3_BD",0, NULL, 0); //Entorno Desarrollo (también quitar librería)
+	conn = mysql_real_connect (conn, "shiva2.upc.es","root", "mysql", "M3_BD",0, NULL, 0); //Entorno Producción
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
@@ -196,10 +202,6 @@ void *AtenderCliente (void *socket) {
 		{
 			Rapido(respuesta,conn,sock_conn);
 		}
-		else if (codigo ==8) //Peticion de Lista Conectados
-		{
-			DameConectados(&lista, respuesta);
-		}
 		else
 				 strcpy (respuesta,"Código de petición no válido");
 		
@@ -207,6 +209,11 @@ void *AtenderCliente (void *socket) {
 		{
 			// Enviamos respuesta
 			write (sock_conn,respuesta, strlen(respuesta));
+		}
+		
+		if ((codigo ==2)||(codigo==0)) //Notificación de Lista Conectados
+		{
+			Conectados (respuesta);
 		}
 	}
 	//Cerramos MYSQL
@@ -234,7 +241,7 @@ int Registrarse (char usuario[20],char contrasena[20], char respuesta[100],MYSQL
 	//Limitamos la longitud de carácteres del nombre de usuario para que no peten otras consultas
 	if (strlen(usuario) > 20) {
 		printf("El nombre de usuario es muy largo\n");
-		strcpy(respuesta, "-2");
+		strcpy(respuesta, "1/-2");
 		return -2;
 	}
 	else {
@@ -284,20 +291,20 @@ int Registrarse (char usuario[20],char contrasena[20], char respuesta[100],MYSQL
 				}
 				else {
 					printf("%s se ha registrado correctamente\n", usuario);
-					strcpy(respuesta, "0");
+					strcpy(respuesta, "1/0");
 					return 0;
 				}
 			}
 		}
 		else {
 			printf("El usuario %s ya existe\n", row[0]);
-			strcpy(respuesta, "-1");
+			strcpy(respuesta, "1/-1");
 			return -1;
 		}	
 	}
-	
+	printf("%s\n", respuesta);
 }
-int Entrar (char usuario[20],char contrasena[20], char respuesta[100],MYSQL *conn,int sock_conn){
+int Entrar (char usuario[20],char contrasena[20], char respuesta[100],MYSQL *conn,int sock_conn) {
 	//Funcion para entrar
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
@@ -316,39 +323,47 @@ int Entrar (char usuario[20],char contrasena[20], char respuesta[100],MYSQL *con
 	if (row == NULL)
 	{
 		printf ("Datos de acceso inválidos\n");
-		strcpy(respuesta, "-2");
-		return -2;
+		strcpy(respuesta, "2/-3");
+		return -3;
 	}
 	else {
-		int pos = DamePosicion (&lista, usuario);
-		if (pos == -1) {
-			pthread_mutex_lock(&mutex);
-			int pon = Pon (&lista,usuario,sock_conn);
-			pthread_mutex_unlock(&mutex);
-			if (pon==-1){
-				printf("No se ha podido iniciar sesión, la lista de conectados está llena y no se ha podido añadir.\n");
-				strcpy(respuesta, "-1");
-				return -1;
-			}
-			else{
-				printf("%s ha iniciado sesión y se ha añadido a la lista de conectados\n", row[0]);
-				strcpy(respuesta, "0");
-				return 0;
-			}
+		int pos = DamePosicionPorSocket (&lista, sock_conn);
+		if (pos != -1) {
+			printf("En este cliente ya se había iniciado sesión con otro usuario.\n");
+			strcpy(respuesta, "2/-2");
+			return -2;
 		}
 		else {
-			if (lista.conectados[pos].socket == sock_conn) {
-				printf("%s ya había iniciado sesión en este cliente y está en la lista de conectados\n", row[0]);
-				strcpy(respuesta, "1");
-				return 1;
+			pos = DamePosicion (&lista, usuario);
+			if (pos == -1) {
+				pthread_mutex_lock(&mutex);
+				int pon = Pon (&lista,usuario,sock_conn);
+				pthread_mutex_unlock(&mutex);
+				if (pon == -1) {
+					printf("No se ha podido iniciar sesión, la lista de conectados está llena y no se ha podido añadir.\n");
+					strcpy(respuesta, "2/-1");
+					return -1;
+				}
+				else{
+					printf("%s ha iniciado sesión y se ha añadido a la lista de conectados\n", row[0]);
+					strcpy(respuesta, "2/0");
+					return 0;
+				}
 			}
 			else {
-				printf("%s ya había iniciado sesión en otro cliente y está en la lista de conectados\n", row[0]);
-				strcpy(respuesta, "2");
-				return 2;
+				if (lista.conectados[pos].socket == sock_conn) {
+					printf("%s ya había iniciado sesión en este cliente y está en la lista de conectados\n", row[0]);
+					strcpy(respuesta, "2/1");
+					return 1;
+				}
+				else {
+					printf("%s ya había iniciado sesión en otro cliente y está en la lista de conectados\n", row[0]);
+					strcpy(respuesta, "2/2");
+				}
 			}
 		}
 	}
+	printf("%s\n", respuesta);
 }
 void Contrasena (char usuario[20], char respuesta[100],MYSQL *conn,int sock_conn){
 	//Procedimiento para devolver la contrasena
@@ -368,11 +383,11 @@ void Contrasena (char usuario[20], char respuesta[100],MYSQL *conn,int sock_conn
 	row = mysql_fetch_row (resultado);
 	if (row == NULL) {
 		printf ("No se han obtenido datos en la consulta\n");
-		strcpy(respuesta, "fail");
+		strcpy(respuesta, "3/fail");
 	}
 	else {
-		printf("%s\n", row[0]);
-		strcpy(respuesta, row[0]);
+		sprintf(respuesta, "3/%s", row[0]);
+		printf("%s\n", respuesta);
 	}
 }
 void Jugadores (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
@@ -393,15 +408,16 @@ void Jugadores (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
 	row = mysql_fetch_row (resultado);
 	if (row == NULL) {
 		printf ("No se han obtenido datos en la consulta\n");
-		strcpy(respuesta, "fail");
+		strcpy(respuesta, "4/fail");
 	}
 	else {
-		strcpy(respuesta, "");
+		strcpy(respuesta, "4/");
 		while (row !=NULL) {
 			printf("%s\n", row[0]);
 			sprintf(respuesta, "%s%s/", respuesta, row[0]);
 			row = mysql_fetch_row (resultado);
 		}
+		printf("%s\n", respuesta);
 	}
 }
 void Ganador (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
@@ -422,11 +438,11 @@ void Ganador (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
 	row = mysql_fetch_row (resultado);
 	if (row == NULL) {
 		printf ("No se han obtenido datos en la consulta\n");
-		strcpy(respuesta, "fail");
+		strcpy(respuesta, "5/fail");
 	}
 	else {
-		printf("%s\n", row[0]);
-		strcpy(respuesta, row[0]);
+		sprintf(respuesta, "5/%s", row[0]);
+		printf("%s\n", respuesta);
 	}
 }
 void Tiempo (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
@@ -447,12 +463,12 @@ void Tiempo (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
 	row = mysql_fetch_row (resultado);
 	if (row == NULL) {
 		printf ("No se han obtenido datos en la consulta\n");
-		strcpy(respuesta, "fail");
+		strcpy(respuesta, "6/fail");
 	}
 	else {
 		int tiempo = atoi (row[0]);
-		printf("%d\n", tiempo);
-		strcpy(respuesta, row[0]);
+		sprintf(respuesta, "6/%s", row[0]);
+		printf("%s\n", respuesta);
 	}
 }
 void Rapido (char respuesta[100],MYSQL *conn,int sock_conn){
@@ -471,12 +487,22 @@ void Rapido (char respuesta[100],MYSQL *conn,int sock_conn){
 	row = mysql_fetch_row (resultado);
 	if (row == NULL) {
 		printf ("No se han obtenido datos en la consulta\n");
-		strcpy(respuesta, "fail");
+		strcpy(respuesta, "7/fail");
 	}
 	else {
-		printf("%s\n", row[0]);
-		strcpy(respuesta, row[0]);
+		sprintf(respuesta, "7/%s", row[0]);
+		printf("%s\n", respuesta);
 	}
+}
+
+void Conectados (char respuesta[512]) {
+	//Enviamos la Lista de Conectados como notificación
+	DameConectados(&lista, respuesta);
+	char notificacion[512];
+	sprintf (notificacion, "8/%s", respuesta);
+	printf("Conectados: %s\n",notificacion);
+	for (int j=0; j < lista.num; j++)
+		write (lista.conectados[j].socket, notificacion, strlen(notificacion));
 }
 
 int main(int argc, char *argv[]) {
@@ -494,15 +520,14 @@ int main(int argc, char *argv[]) {
 	//htonl formatea el numero que recibe al formato necesario
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	// establecemos el puerto de escucha
-	serv_adr.sin_port = htons(9020);
+	//serv_adr.sin_port = htons(9080); //Entorno Desarrollo
+	serv_adr.sin_port = htons(50058); //Entorno Producción
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind");
-	//La cola de peticiones pendientes no podr? ser superior a 3
+	//La cola de peticiones pendientes no podr ser superior a 3
 	if (listen(sock_listen, 3) < 0)
 		printf("Error en el Listen");
 	
-	int i=0;
-	int sockets[100];
 	pthread_t thread;
 	// Bucle infinito
 	for (;;){
