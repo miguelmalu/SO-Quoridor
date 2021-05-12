@@ -16,6 +16,13 @@ namespace WindowsFormsApplication1
     {
         Socket server;
         Thread atender;
+
+        string usuario;
+
+        delegate void DelegadoParaPonerTexto(string texto);
+
+        List<Form2> formularios = new List<Form2>();
+
         List<string> conectados = new List<string>();
         List<string> invitados = new List<string>();
         int numSeleccionados = 0;
@@ -23,8 +30,30 @@ namespace WindowsFormsApplication1
         public Form1()
         {
             InitializeComponent();
-            CheckForIllegalCrossThreadCalls = false; //Necesario para que los elementos de los formularios puedan ser
-            //accedidos desde threads diferentes a los que los crearon
+        }
+
+        private void ListaConectados(string mensaje)
+        {
+            string[] trozos = mensaje.Split('/');
+            int numero = Convert.ToInt32(trozos[1]);
+            if (numero != 0)
+            {
+                ConectadosGrid.ColumnCount = 1;
+                ConectadosGrid.RowCount = numero;
+                for (int i = 2; i < trozos.Length; i++)
+                {
+                    mensaje = trozos[i].Split('\0')[0];
+                    ConectadosGrid.Rows[i - 2].Cells[0].Value = mensaje;
+                }
+            }
+        }
+
+        private void PonerEnMarchaFormulario(int ID)
+        {
+            int cont = formularios.Count;
+            Form2 f = new Form2(cont, ID, usuario, server);
+            formularios.Add(f);
+            f.ShowDialog();
         }
 
         private void AtenderServidor()
@@ -35,50 +64,60 @@ namespace WindowsFormsApplication1
                 byte[] msg2 = new byte[80];
                 server.Receive(msg2);
                 //Limpio el mensaje
-                string mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-                string[] trozos = mensaje.Split('/');
+                string respuesta = Encoding.ASCII.GetString(msg2).Split('\0')[0];
+                string[] trozos = respuesta.Split('/');
                 int codigo = Convert.ToInt32(trozos[0]);
+                string mensaje;
+                int nform;
 
                 switch (codigo)
                 {
                     case 1: //Registro
-                        if (trozos[1] == "0")
+                        int codigo2 = Convert.ToInt32(trozos[1]);
+                        if (codigo2 == 0)
                             MessageBox.Show(UsuarioBox.Text + " se ha registrado correctamente");
-                        else if (trozos[1] == "-1")
+                        else if (codigo2 == -1)
                             MessageBox.Show(UsuarioBox.Text + " ya está en uso");
-                        else if (trozos[1] == "-2")
+                        else if (codigo2 == -2)
                             MessageBox.Show("El nombre de usuario es muy largo");
                         break;
                     case 2: //Login
-                        if (trozos[1] == "-3")
+                        codigo2 = Convert.ToInt32(trozos[1]);
+                        if (codigo2 == -3)
                             MessageBox.Show("Datos de acceso inválidos");
                         else {
                             MessageBox.Show("Datos de acceso correctos");
-                            if (trozos[1] == "1") {
+                            if (codigo2 == 1) {
                                 MessageBox.Show("Has iniciado sesión como " + UsuarioBox.Text);
                                 conectados.Add(UsuarioBox.Text);
-                            } else if (trozos[1] == "2")
+                                this.usuario = UsuarioBox.Text;
+                            } else if (codigo2 == 2)
                                 MessageBox.Show("Ya habías iniciado sesión como " + UsuarioBox.Text + " en este cliente");
-                            else if (trozos[1] == "3")
+                            else if (codigo2 == 3)
                                 MessageBox.Show("Ya habías iniciado sesión como " + UsuarioBox.Text + " en otro cliente");
-                            else if (trozos[1] == "-1")
+                            else if (codigo2 == -1)
                                 MessageBox.Show("No se ha podido iniciar sesión, la lista de conectados está llena");
-                            else if (trozos[1] == "-2")
+                            else if (codigo2 == -2)
                                 MessageBox.Show("En este cliente ya se había iniciado sesión con otro usuario");
                         }
                         break;
                     case 3: //Contraseña del usuario
-                        if (trozos[1] != "fail")
-                            MessageBox.Show("Tu contraseña es: " + trozos[1]);
+                        mensaje = trozos[1].Split('\0')[0];
+                        if (mensaje != "fail")
+                            MessageBox.Show("Tu contraseña es: " + mensaje);
                         else
                             MessageBox.Show("No se ha encontrado el usuario");
                         break;
                     case 4: //Jugadores de la partida
-                        if (trozos[1] != "fail")
+                        mensaje = trozos[1].Split('\0')[0];
+                        if (mensaje != "fail")
                         {
                             string jugadores = "Los jugadores en esta partida son: ";
                             for (int i = 1; i < (trozos.Length - 1); i++)
-                                jugadores = jugadores + trozos[i] + ", ";
+                            {
+                                mensaje = trozos[i].Split('\0')[0];
+                                jugadores = jugadores + mensaje + ", ";
+                            }
                             jugadores = jugadores.Remove(jugadores.Length - 2);
                             MessageBox.Show(jugadores);
                         }
@@ -86,8 +125,9 @@ namespace WindowsFormsApplication1
                             MessageBox.Show("No se ha encontrado la partida");
                         break;
                     case 5: //Ganador de la partida
-                        if (trozos[1] != "fail")
-                            MessageBox.Show("El ganador de la partida es: " + trozos[1]);
+                        mensaje = trozos[1].Split('\0')[0];
+                        if (mensaje != "fail")
+                            MessageBox.Show("El ganador de la partida es: " + mensaje);
                         else
                             MessageBox.Show("No se ha encontrado la partida");
                         break;
@@ -99,34 +139,31 @@ namespace WindowsFormsApplication1
                             MessageBox.Show("No se ha encontrado la partida");
                         break;
                     case 7: //Ganador más rápido
+                        mensaje = trozos[1].Split('\0')[0];
                         if (trozos[1] != "fail")
-                            MessageBox.Show("El ganador más rápdio es: " + trozos[1]);
+                            MessageBox.Show("El ganador más rápdio es: " + mensaje);
                         else
                             MessageBox.Show("No se han obtenido datos en la consulta");
                         break;
                     case 8: //Notificación de Lista de Conectados
-                        int numero = Convert.ToInt32(trozos[1]);
-                        if (numero != 0)
-                        {
-                            ConectadosGrid.ColumnCount = 1;
-                            ConectadosGrid.RowCount = numero;
-                            for (int i = 2; i < trozos.Length; i++)
-                            {
-                                ConectadosGrid.Rows[i - 2].Cells[0].Value = trozos[i];
-                            }
-                        }
+                        //Haz tu lo que no me dejas hacer a mi
+                        DelegadoParaPonerTexto delegado = new DelegadoParaPonerTexto(ListaConectados);
+                        ConectadosGrid.Invoke(delegado, new object[] { respuesta });
                         break;
                     case 9: //Notificación de Invitar
-                        if (trozos[1] == "-1")
+                        mensaje = trozos[1].Split('\0')[0];
+                        if (mensaje == "-4")
+                            MessageBox.Show("No se ha seleccionado ningún jugador");
+                        else if (mensaje == "-1")
                             MessageBox.Show("No se ha encontrado a un invitado");
-                        else if (trozos[1] == "-2")
+                        else if (mensaje == "-2")
                             MessageBox.Show("No hay jugadores suficientes");
-                        else if (trozos[1] == "-3")
+                        else if (mensaje == "-3")
                             MessageBox.Show("No se permiten más partidas");
                         else
                         {
                             int ID = Convert.ToInt32(trozos[2]);
-                            string pregunta = trozos[1] + " te ha invitado a la partida " + ID;
+                            string pregunta = mensaje + " te ha invitado a la partida " + ID;
                             DialogResult dialogo = MessageBox.Show(pregunta, "Invitación", MessageBoxButtons.YesNo);
                             if (dialogo == DialogResult.Yes)
                                 mensaje = "10/" + ID + "/YES";
@@ -138,16 +175,27 @@ namespace WindowsFormsApplication1
                         }
                         break;
                     case 10: //Notificación de Respuesta Invitación
-                        if (trozos[2] == "TRUE")
+                        mensaje = trozos[2].Split('\0')[0];
+                        if (mensaje == "TRUE")
                         {
                             MessageBox.Show("La partida iniciará en breves");
+                            int ID = Convert.ToInt32(trozos[1]);
                             //Ahora se tendría que iniciar el Form2
+                            ThreadStart ts = delegate { PonerEnMarchaFormulario(ID); };
+                            Thread T = new Thread(ts);
+                            T.Start();
                         }
-                        else if (trozos[2] == "FALSE")
+                        else if (mensaje == "FALSE")
                             MessageBox.Show("No se cumplen los requisitos para iniciar un partida");
                         break;
                     //case 11: //Notificación de Jugada
                     //    break;
+                    case 12: //Notificación de Mensaje
+                        nform = Convert.ToInt32(trozos[1]);
+                        mensaje = trozos[3].Split('\0')[0];
+                        formularios[nform].TomaRespuesta2(mensaje);
+                        //MessageBox.Show(mensaje);
+                        break;
                 }
             }
         }
@@ -157,7 +205,7 @@ namespace WindowsFormsApplication1
             //Creamos un IPEndPoint con el ip del servidor y puerto del servidor 
             //al que deseamos conectarnos
             //IPAddress direc = IPAddress.Parse("192.168.56.102"); //Entorno Desarrollo
-            //IPEndPoint ipep = new IPEndPoint(direc, 9042); //Entorno Desarrollo
+            //IPEndPoint ipep = new IPEndPoint(direc, 9046); //Entorno Desarrollo
             IPAddress direc = IPAddress.Parse("147.83.117.22"); //Entorno Producción
             IPEndPoint ipep = new IPEndPoint(direc, 50057); //Entorno Producción
             //Creamos el socket 
@@ -343,6 +391,24 @@ namespace WindowsFormsApplication1
         private void ConectadosGrid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             int fila = e.RowIndex;
+            ////for (int i=0; i < invitados.Count; i++) {
+            ////    if (invitados[i] != ConectadosGrid.CurrentCell.Value.ToString())
+            ////    {
+            ////        if (invitados[i] != usuario)
+            ////        {
+            //            ConectadosGrid.Rows[fila].DefaultCellStyle.BackColor = Color.Green;
+            //            invitados.Add(ConectadosGrid.CurrentCell.Value.ToString());
+            //            numSeleccionados++;
+            //        } else
+            //            MessageBox.Show("Eres el anfitrión, no te puedes invitar");
+            //    } else {
+            //        ConectadosGrid.Rows[fila].DefaultCellStyle.BackColor = Color.White;
+            //        invitados.Remove(ConectadosGrid.CurrentCell.Value.ToString());
+            //        numSeleccionados--;
+            //        MessageBox.Show("Se ha eliminado a " + ConectadosGrid.CurrentCell.Value.ToString() + " de la lista de invitados");
+            //    }
+
+            //}
             ConectadosGrid.Rows[fila].DefaultCellStyle.BackColor = Color.Green;
             invitados.Add(ConectadosGrid.CurrentCell.Value.ToString());
             numSeleccionados++;
@@ -355,12 +421,20 @@ namespace WindowsFormsApplication1
                 //Invitar
                 string mensaje = "9/";
                 if (numSeleccionados >= 1)
+                {
                     for (int i = 0; i < numSeleccionados; i++)
                         mensaje = mensaje + invitados[i] + ",";
                     mensaje = mensaje.Remove(mensaje.Length - 1);
-                // Enviamos al servidor la consulta
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-                server.Send(msg);
+                    // Enviamos al servidor la consulta
+                    byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                    server.Send(msg);
+                    //Limpiamos selección
+                    ConectadosGrid.ClearSelection();
+                    ConectadosGrid.RowsDefaultCellStyle.BackColor = Color.White; //No va
+                    invitados.Clear();
+                    numSeleccionados = 0;
+                } else
+                    MessageBox.Show("No se ha seleccionado ningún jugador");
             }
             catch (Exception)
             {
@@ -368,6 +442,21 @@ namespace WindowsFormsApplication1
                 MessageBox.Show("Error en las invitaciones");
                 return;
             }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            //Mensaje de desconexión
+            string mensaje = "0/";
+
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+            server.Send(msg);
+
+            // Nos desconectamos
+            atender.Abort();
+            this.BackColor = Color.Gray;
+            server.Shutdown(SocketShutdown.Both);
+            server.Close();
         }
     }
 }

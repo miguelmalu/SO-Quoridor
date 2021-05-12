@@ -49,8 +49,8 @@
             this.Tiempo = new System.Windows.Forms.RadioButton();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.ConectadosGrid = new System.Windows.Forms.DataGridView();
             this.Invitar = new System.Windows.Forms.Button();
+            this.ConectadosGrid = new System.Windows.Forms.DataGridView();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -301,6 +301,17 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Lista Conectados";
             // 
+            // Invitar
+            // 
+            this.Invitar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Invitar.Location = new System.Drawing.Point(59, 390);
+            this.Invitar.Name = "Invitar";
+            this.Invitar.Size = new System.Drawing.Size(75, 23);
+            this.Invitar.TabIndex = 12;
+            this.Invitar.Text = "Invitar";
+            this.Invitar.UseVisualStyleBackColor = true;
+            this.Invitar.Click += new System.EventHandler(this.Invitar_Click);
+            // 
             // ConectadosGrid
             // 
             this.ConectadosGrid.AllowUserToResizeColumns = false;
@@ -319,17 +330,6 @@
             this.ConectadosGrid.TabIndex = 11;
             this.ConectadosGrid.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.ConectadosGrid_CellClick);
             // 
-            // Invitar
-            // 
-            this.Invitar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Invitar.Location = new System.Drawing.Point(59, 390);
-            this.Invitar.Name = "Invitar";
-            this.Invitar.Size = new System.Drawing.Size(75, 23);
-            this.Invitar.TabIndex = 12;
-            this.Invitar.Text = "Invitar";
-            this.Invitar.UseVisualStyleBackColor = true;
-            this.Invitar.Click += new System.EventHandler(this.Invitar_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -343,6 +343,7 @@
             this.Controls.Add(this.Conectar);
             this.Name = "Form1";
             this.Text = "Cliente";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);

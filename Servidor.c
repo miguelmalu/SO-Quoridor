@@ -346,13 +346,21 @@ void *AtenderCliente (void *socket) {
 		int codigo =  atoi (p);
 		// Ya tenemos el codigo de la peticion
 		printf ("Codigo: %d\n", codigo);
-		
+		int numForm;
 		if (codigo !=0)
 			p = strtok( NULL, "/");
+		if ((codigo==11)||(codigo==12)) {
+			numForm =  atoi (p);
+			printf ("Form Secundario: %d\n", numForm);
+			p = strtok( NULL, "/");
+		}	
+		
+		
 		char usuario[20];
 		char contrasena[20];
 		char InvitadosPartida[300];
 		char RespuestaInvitados[10];
+		char MensajeJugador[100];
 		int JugadaJugador;
 		int IDpartida;
 		
@@ -398,11 +406,16 @@ void *AtenderCliente (void *socket) {
 			IDpartida = atoi (p);
 			p = strtok( NULL, "/");
 			JugadaJugador = atoi (p);
-			Jugada(JugadaJugador,IDpartida,sock_conn);
+			Jugada(JugadaJugador,IDpartida,sock_conn,numForm);
+		} else if (codigo ==12) { //Notificación de Mesaje
+			IDpartida = atoi (p);
+			p = strtok( NULL, "/");
+			strcpy (MensajeJugador, p);
+			Mensaje(MensajeJugador,IDpartida,sock_conn,numForm);
 		} else
 			strcpy (respuesta,"Código de petición no válido");
 		
-		if ((codigo ==1)||(codigo ==2)||(codigo ==3)||(codigo ==4)||(codigo ==5)||(codigo ==6)||(codigo ==7)) //Enviamos respuesta
+		if ((codigo==1)||(codigo==2)||(codigo==3)||(codigo==4)||(codigo==5)||(codigo==6)||(codigo==7)) //Enviamos respuesta
 			write (sock_conn,respuesta, strlen(respuesta));
 		if ((codigo ==2)||(codigo==0)) //Notificación de Lista Conectados
 			Conectados (respuesta);
@@ -750,7 +763,7 @@ void RespuestaInvitacion (char RespuestaInvitados[10],int IDpartida,int socket) 
 		}
 	}
 	printf("Invitadoseliminados: %d\n", invitadoseliminados);
-	if (respuestasinvitaciones = invitados) {
+	if (respuestasinvitaciones == invitados) {
 		int op = invitados-invitadoseliminados;
 		printf("op: %d\n", op);
 		if (op > 0)
@@ -773,17 +786,39 @@ void RespuestaInvitacion (char RespuestaInvitados[10],int IDpartida,int socket) 
 	}
 }
 
-void Jugada (int JugadaJugador, int IDpartida, int socket) {
+void Jugada (int JugadaJugador, int IDpartida, int socket, int numForm) {
 	//Enviamos la Jugada como notificación
 	char notificacion[512];
-	sprintf (notificacion, "11/%d/%d", IDpartida, JugadaJugador);
-	if (tabla[IDpartida].s_j1 != (socket || -1))
+	sprintf (notificacion, "11/%d/%d/%d", numForm, IDpartida, JugadaJugador);
+	if (tabla[IDpartida].s_j1 != (socket || -1)) //Se tiene que cambiar, igual que abajo
 		write (tabla[IDpartida].s_j1, notificacion, strlen(notificacion));
 	if (tabla[IDpartida].s_j2 != (socket || -1))
 		write (tabla[IDpartida].s_j2, notificacion, strlen(notificacion));
 	if (tabla[IDpartida].s_j3 != (socket || -1))
 		write (tabla[IDpartida].s_j3, notificacion, strlen(notificacion));
 	if (tabla[IDpartida].s_j4 != (socket || -1))
+		write (tabla[IDpartida].s_j4, notificacion, strlen(notificacion));
+}
+
+void Mensaje (char MensajeJugador[100], int IDpartida, int socket, int numForm) {
+	//Enviamos la Jugada como notificación
+	printf("MensajeJugador: %s\n",MensajeJugador); //Debug
+	printf("SocketRecibido: %d\n",socket); //Debug
+	char notificacion[512];
+	sprintf (notificacion, "12/%d/%d/%s", numForm, IDpartida, MensajeJugador);
+	if (tabla[IDpartida].s_j1 != socket) {
+		write (tabla[IDpartida].s_j1, notificacion, strlen(notificacion));
+		printf("SocketJ1: %d\n",tabla[IDpartida].s_j1); //Debug
+		printf("Enviando a J1\n"); //Debug
+	}
+	if (tabla[IDpartida].s_j2 != socket) {
+		write (tabla[IDpartida].s_j2, notificacion, strlen(notificacion));
+		printf("SocketJ2: %d\n",tabla[IDpartida].s_j2); //Debug
+		printf("Enviando a J2\n"); //Debug
+	}
+	if (tabla[IDpartida].s_j3 != socket)
+		write (tabla[IDpartida].s_j3, notificacion, strlen(notificacion));
+	if (tabla[IDpartida].s_j4 != socket)
 		write (tabla[IDpartida].s_j4, notificacion, strlen(notificacion));
 }
 
@@ -802,7 +837,7 @@ int main(int argc, char *argv[]) {
 	//htonl formatea el numero que recibe al formato necesario
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	// establecemos el puerto de escucha
-	//int puerto = 9042; //Entorno Desarrollo
+	//int puerto = 9046; //Entorno Desarrollo
 	int puerto = 50057; //Entorno Producción
 	serv_adr.sin_port = htons(puerto);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0) {

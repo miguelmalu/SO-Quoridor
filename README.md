@@ -20,3 +20,6 @@
 - **Generada** por Freddy  
 - **Verificada** por Esther y Miguel  
 - [**Comunicada** por Maria](https://drive.google.com/file/d/1WcjG6nIf0sJqjqccxzo6zrHEYC03thVl/view?usp=sharing)
+### Versión 5
+	Protección Cross-Threading y Múltiples Formularios
+- **Generada** por Miguel  

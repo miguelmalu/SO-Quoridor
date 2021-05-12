@@ -6,17 +6,55 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Net;
+using System.Net.Sockets;
 
-namespace Quoridor
+namespace WindowsFormsApplication1
 {
     public partial class Form2 : Form
     {
         PictureBox seleccionado = null;
 
-        public Form2()
+        int nForm;
+        int ID;
+        string usuario;
+
+        Socket server;
+
+        public Form2(int nForm, int ID, string usuario, Socket server)
         {
             InitializeComponent();
+            this.nForm = nForm;
+            this.server = server;
+            this.ID = ID;
+            this.usuario = usuario;
         }
+
+        private void Saludar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //Saludar
+                string mensaje = "12/" + nForm + "/" + ID + "/" + usuario + ": Hola";
+                // Enviamos al servidor la consulta
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+            }
+            catch (Exception)
+            {
+                //Si hay excepcion imprimimos error y salimos del programa con return 
+                MessageBox.Show("Error en el Saludo");
+                return;
+            }
+        }
+
+        public void TomaRespuesta2(string mensaje)
+        {
+            MessageBox.Show(mensaje);
+        }
+
+
+        //QUORIDOR
 
         public void seleccion(object objeto)
         {

@@ -1,4 +1,4 @@
-﻿namespace Quoridor
+﻿namespace WindowsFormsApplication1
 {
     partial class Form2
     {
@@ -112,6 +112,7 @@
             this.pictureBox81 = new System.Windows.Forms.PictureBox();
             this.jugador1 = new System.Windows.Forms.PictureBox();
             this.jugador2 = new System.Windows.Forms.PictureBox();
+            this.Saludar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
@@ -1114,11 +1115,23 @@
             this.jugador2.TabStop = false;
             this.jugador2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.seleccionJugador2);
             // 
-            // Form1
+            // Saludar
+            // 
+            this.Saludar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Saludar.Location = new System.Drawing.Point(601, 50);
+            this.Saludar.Name = "Saludar";
+            this.Saludar.Size = new System.Drawing.Size(173, 23);
+            this.Saludar.TabIndex = 83;
+            this.Saludar.Text = "Saludar al resto de jugadores";
+            this.Saludar.UseVisualStyleBackColor = true;
+            this.Saludar.Click += new System.EventHandler(this.Saludar_Click);
+            // 
+            // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(554, 567);
+            this.ClientSize = new System.Drawing.Size(852, 567);
+            this.Controls.Add(this.Saludar);
             this.Controls.Add(this.jugador2);
             this.Controls.Add(this.jugador1);
             this.Controls.Add(this.pictureBox73);
@@ -1202,7 +1215,7 @@
             this.Controls.Add(this.pictureBox4);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.pictureBox1);
-            this.Name = "Form1";
+            this.Name = "Form2";
             this.Text = "Quoridor";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
@@ -1376,6 +1389,7 @@
         private System.Windows.Forms.PictureBox pictureBox81;
         private System.Windows.Forms.PictureBox jugador1;
         private System.Windows.Forms.PictureBox jugador2;
+        private System.Windows.Forms.Button Saludar;
     }
 }
 
