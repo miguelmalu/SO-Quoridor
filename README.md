@@ -23,3 +23,4 @@
 ### Versión 5
 	Protección Cross-Threading y Múltiples Formularios
 - **Generada** por Miguel  
+- **Verificada** por Maria   
