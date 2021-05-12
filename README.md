@@ -18,4 +18,4 @@
 ### Versión 4
 	Tabla de partidas: Invitaciones
 - **Generada** por Freddy  
-- **Verificada** por Esther  
+- **Verificada** por Esther y Miguel  
