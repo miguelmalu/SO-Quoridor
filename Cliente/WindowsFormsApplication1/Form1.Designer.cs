@@ -33,6 +33,7 @@
             this.Conectar = new System.Windows.Forms.Button();
             this.Consultar = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.PassCheckBox = new System.Windows.Forms.CheckBox();
             this.Entrar = new System.Windows.Forms.Button();
             this.Registrarse = new System.Windows.Forms.Button();
             this.ContraseñaBox = new System.Windows.Forms.TextBox();
@@ -49,7 +50,7 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.ConectadosGrid = new System.Windows.Forms.DataGridView();
-            this.PassCheckBox = new System.Windows.Forms.CheckBox();
+            this.Invitar = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -114,6 +115,18 @@
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Acceso";
+            // 
+            // PassCheckBox
+            // 
+            this.PassCheckBox.AutoSize = true;
+            this.PassCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.PassCheckBox.Location = new System.Drawing.Point(60, 99);
+            this.PassCheckBox.Name = "PassCheckBox";
+            this.PassCheckBox.Size = new System.Drawing.Size(122, 17);
+            this.PassCheckBox.TabIndex = 12;
+            this.PassCheckBox.Text = "Mostrar constraseña";
+            this.PassCheckBox.UseVisualStyleBackColor = true;
+            this.PassCheckBox.CheckedChanged += new System.EventHandler(this.PassCheckBox_Check);
             // 
             // Entrar
             // 
@@ -278,6 +291,7 @@
             // groupBox4
             // 
             this.groupBox4.BackColor = System.Drawing.Color.Silver;
+            this.groupBox4.Controls.Add(this.Invitar);
             this.groupBox4.Controls.Add(this.ConectadosGrid);
             this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox4.Location = new System.Drawing.Point(254, 46);
@@ -301,20 +315,20 @@
             this.ConectadosGrid.ReadOnly = true;
             this.ConectadosGrid.RowHeadersVisible = false;
             this.ConectadosGrid.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this.ConectadosGrid.Size = new System.Drawing.Size(161, 363);
+            this.ConectadosGrid.Size = new System.Drawing.Size(161, 342);
             this.ConectadosGrid.TabIndex = 11;
+            this.ConectadosGrid.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.ConectadosGrid_CellClick);
             // 
-            // PassCheckBox
+            // Invitar
             // 
-            this.PassCheckBox.AutoSize = true;
-            this.PassCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PassCheckBox.Location = new System.Drawing.Point(60, 99);
-            this.PassCheckBox.Name = "PassCheckBox";
-            this.PassCheckBox.Size = new System.Drawing.Size(122, 17);
-            this.PassCheckBox.TabIndex = 12;
-            this.PassCheckBox.Text = "Mostrar constraseña";
-            this.PassCheckBox.UseVisualStyleBackColor = true;
-            this.PassCheckBox.CheckedChanged += new System.EventHandler(this.PassCheckBox_Check);
+            this.Invitar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Invitar.Location = new System.Drawing.Point(59, 390);
+            this.Invitar.Name = "Invitar";
+            this.Invitar.Size = new System.Drawing.Size(75, 23);
+            this.Invitar.TabIndex = 12;
+            this.Invitar.Text = "Invitar";
+            this.Invitar.UseVisualStyleBackColor = true;
+            this.Invitar.Click += new System.EventHandler(this.Invitar_Click);
             // 
             // Form1
             // 
@@ -365,6 +379,7 @@
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.DataGridView ConectadosGrid;
         private System.Windows.Forms.CheckBox PassCheckBox;
+        private System.Windows.Forms.Button Invitar;
     }
 }
 
