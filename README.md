@@ -28,3 +28,4 @@
 ### Versión Final
 	Implementación del juego y mejoras varias
 - **Generada** por Maria  
+- **Verificada** por Miguel  
