@@ -93,6 +93,21 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Ganador.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PeoVerd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PeoBlau.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PeoGroc.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PeoVermell.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

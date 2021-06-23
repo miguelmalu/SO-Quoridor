@@ -33,6 +33,8 @@
             this.Conectar = new System.Windows.Forms.Button();
             this.Consultar = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.Salir = new System.Windows.Forms.Button();
+            this.EliminarCuenta = new System.Windows.Forms.Button();
             this.PassCheckBox = new System.Windows.Forms.CheckBox();
             this.Entrar = new System.Windows.Forms.Button();
             this.Registrarse = new System.Windows.Forms.Button();
@@ -45,12 +47,22 @@
             this.Ganador = new System.Windows.Forms.RadioButton();
             this.Desconectar = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.Intervalo = new System.Windows.Forms.RadioButton();
+            this.GanadorAmbos = new System.Windows.Forms.RadioButton();
+            this.JugadoresContra = new System.Windows.Forms.RadioButton();
             this.Rápido = new System.Windows.Forms.RadioButton();
             this.Tiempo = new System.Windows.Forms.RadioButton();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.MaxBox = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.MinBox = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.AdversarioBox = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.Invitar = new System.Windows.Forms.Button();
             this.ConectadosGrid = new System.Windows.Forms.DataGridView();
+            this.SesionLbl = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -75,6 +87,7 @@
             this.UsuarioBox.Name = "UsuarioBox";
             this.UsuarioBox.Size = new System.Drawing.Size(120, 20);
             this.UsuarioBox.TabIndex = 3;
+            this.UsuarioBox.Text = "Paca";
             // 
             // Conectar
             // 
@@ -90,7 +103,7 @@
             // Consultar
             // 
             this.Consultar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Consultar.Location = new System.Drawing.Point(80, 154);
+            this.Consultar.Location = new System.Drawing.Point(73, 217);
             this.Consultar.Name = "Consultar";
             this.Consultar.Size = new System.Drawing.Size(75, 23);
             this.Consultar.TabIndex = 5;
@@ -101,6 +114,8 @@
             // groupBox1
             // 
             this.groupBox1.BackColor = System.Drawing.Color.Silver;
+            this.groupBox1.Controls.Add(this.Salir);
+            this.groupBox1.Controls.Add(this.EliminarCuenta);
             this.groupBox1.Controls.Add(this.PassCheckBox);
             this.groupBox1.Controls.Add(this.Entrar);
             this.groupBox1.Controls.Add(this.Registrarse);
@@ -111,10 +126,32 @@
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(23, 46);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(225, 160);
+            this.groupBox1.Size = new System.Drawing.Size(225, 242);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Acceso";
+            // 
+            // Salir
+            // 
+            this.Salir.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Salir.Location = new System.Drawing.Point(35, 157);
+            this.Salir.Name = "Salir";
+            this.Salir.Size = new System.Drawing.Size(156, 23);
+            this.Salir.TabIndex = 14;
+            this.Salir.Text = "Cerrar sesión";
+            this.Salir.UseVisualStyleBackColor = true;
+            this.Salir.Click += new System.EventHandler(this.Salir_Click);
+            // 
+            // EliminarCuenta
+            // 
+            this.EliminarCuenta.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.EliminarCuenta.Location = new System.Drawing.Point(35, 186);
+            this.EliminarCuenta.Name = "EliminarCuenta";
+            this.EliminarCuenta.Size = new System.Drawing.Size(156, 23);
+            this.EliminarCuenta.TabIndex = 13;
+            this.EliminarCuenta.Text = "Eliminar cuenta";
+            this.EliminarCuenta.UseVisualStyleBackColor = true;
+            this.EliminarCuenta.Click += new System.EventHandler(this.EliminarCuenta_Click);
             // 
             // PassCheckBox
             // 
@@ -157,6 +194,7 @@
             this.ContraseñaBox.Name = "ContraseñaBox";
             this.ContraseñaBox.Size = new System.Drawing.Size(120, 20);
             this.ContraseñaBox.TabIndex = 5;
+            this.ContraseñaBox.Text = "1234";
             this.ContraseñaBox.UseSystemPasswordChar = true;
             // 
             // label1
@@ -173,7 +211,7 @@
             // 
             this.Contraseña.AutoSize = true;
             this.Contraseña.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.Contraseña.Location = new System.Drawing.Point(28, 30);
+            this.Contraseña.Location = new System.Drawing.Point(28, 25);
             this.Contraseña.Name = "Contraseña";
             this.Contraseña.Size = new System.Drawing.Size(133, 17);
             this.Contraseña.TabIndex = 7;
@@ -185,7 +223,7 @@
             // 
             this.Jugadores.AutoSize = true;
             this.Jugadores.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.Jugadores.Location = new System.Drawing.Point(28, 53);
+            this.Jugadores.Location = new System.Drawing.Point(28, 48);
             this.Jugadores.Name = "Jugadores";
             this.Jugadores.Size = new System.Drawing.Size(135, 17);
             this.Jugadores.TabIndex = 7;
@@ -197,7 +235,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.label3.Location = new System.Drawing.Point(27, 30);
+            this.label3.Location = new System.Drawing.Point(57, 24);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(40, 13);
             this.label3.TabIndex = 8;
@@ -206,7 +244,7 @@
             // PartidaBox
             // 
             this.PartidaBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PartidaBox.Location = new System.Drawing.Point(73, 27);
+            this.PartidaBox.Location = new System.Drawing.Point(104, 21);
             this.PartidaBox.Name = "PartidaBox";
             this.PartidaBox.Size = new System.Drawing.Size(62, 20);
             this.PartidaBox.TabIndex = 9;
@@ -215,7 +253,7 @@
             // 
             this.Ganador.AutoSize = true;
             this.Ganador.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Ganador.Location = new System.Drawing.Point(28, 76);
+            this.Ganador.Location = new System.Drawing.Point(28, 71);
             this.Ganador.Name = "Ganador";
             this.Ganador.Size = new System.Drawing.Size(127, 17);
             this.Ganador.TabIndex = 8;
@@ -237,6 +275,9 @@
             // groupBox2
             // 
             this.groupBox2.BackColor = System.Drawing.Color.Silver;
+            this.groupBox2.Controls.Add(this.Intervalo);
+            this.groupBox2.Controls.Add(this.GanadorAmbos);
+            this.groupBox2.Controls.Add(this.JugadoresContra);
             this.groupBox2.Controls.Add(this.Rápido);
             this.groupBox2.Controls.Add(this.Tiempo);
             this.groupBox2.Controls.Add(this.Jugadores);
@@ -244,18 +285,55 @@
             this.groupBox2.Controls.Add(this.Consultar);
             this.groupBox2.Controls.Add(this.Ganador);
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox2.Location = new System.Drawing.Point(23, 282);
+            this.groupBox2.Location = new System.Drawing.Point(23, 294);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(225, 187);
+            this.groupBox2.Size = new System.Drawing.Size(225, 255);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Petición";
+            // 
+            // Intervalo
+            // 
+            this.Intervalo.AutoSize = true;
+            this.Intervalo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.Intervalo.Location = new System.Drawing.Point(28, 186);
+            this.Intervalo.Name = "Intervalo";
+            this.Intervalo.Size = new System.Drawing.Size(136, 17);
+            this.Intervalo.TabIndex = 13;
+            this.Intervalo.TabStop = true;
+            this.Intervalo.Text = "Partidas en un intervalo";
+            this.Intervalo.UseVisualStyleBackColor = true;
+            // 
+            // GanadorAmbos
+            // 
+            this.GanadorAmbos.AutoSize = true;
+            this.GanadorAmbos.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.GanadorAmbos.Location = new System.Drawing.Point(28, 140);
+            this.GanadorAmbos.Name = "GanadorAmbos";
+            this.GanadorAmbos.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.GanadorAmbos.Size = new System.Drawing.Size(149, 17);
+            this.GanadorAmbos.TabIndex = 12;
+            this.GanadorAmbos.TabStop = true;
+            this.GanadorAmbos.Text = "Ganador con X adversario";
+            this.GanadorAmbos.UseVisualStyleBackColor = true;
+            // 
+            // JugadoresContra
+            // 
+            this.JugadoresContra.AutoSize = true;
+            this.JugadoresContra.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.JugadoresContra.Location = new System.Drawing.Point(28, 163);
+            this.JugadoresContra.Name = "JugadoresContra";
+            this.JugadoresContra.Size = new System.Drawing.Size(194, 17);
+            this.JugadoresContra.TabIndex = 11;
+            this.JugadoresContra.TabStop = true;
+            this.JugadoresContra.Text = "Jugadores contra los que he jugado";
+            this.JugadoresContra.UseVisualStyleBackColor = true;
             // 
             // Rápido
             // 
             this.Rápido.AutoSize = true;
             this.Rápido.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.Rápido.Location = new System.Drawing.Point(28, 122);
+            this.Rápido.Location = new System.Drawing.Point(28, 117);
             this.Rápido.Name = "Rápido";
             this.Rápido.Size = new System.Drawing.Size(120, 17);
             this.Rápido.TabIndex = 10;
@@ -267,7 +345,7 @@
             // 
             this.Tiempo.AutoSize = true;
             this.Tiempo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.Tiempo.Location = new System.Drawing.Point(28, 99);
+            this.Tiempo.Location = new System.Drawing.Point(28, 94);
             this.Tiempo.Name = "Tiempo";
             this.Tiempo.Size = new System.Drawing.Size(129, 17);
             this.Tiempo.TabIndex = 9;
@@ -278,15 +356,77 @@
             // groupBox3
             // 
             this.groupBox3.BackColor = System.Drawing.Color.Silver;
+            this.groupBox3.Controls.Add(this.label5);
+            this.groupBox3.Controls.Add(this.MaxBox);
+            this.groupBox3.Controls.Add(this.label6);
+            this.groupBox3.Controls.Add(this.MinBox);
+            this.groupBox3.Controls.Add(this.label4);
+            this.groupBox3.Controls.Add(this.AdversarioBox);
             this.groupBox3.Controls.Add(this.label3);
             this.groupBox3.Controls.Add(this.PartidaBox);
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox3.Location = new System.Drawing.Point(23, 212);
+            this.groupBox3.Location = new System.Drawing.Point(254, 398);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(225, 64);
+            this.groupBox3.Size = new System.Drawing.Size(225, 151);
             this.groupBox3.TabIndex = 14;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Datos";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.label5.Location = new System.Drawing.Point(23, 118);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(54, 13);
+            this.label5.TabIndex = 14;
+            this.label5.Text = "Fecha Fin";
+            // 
+            // MaxBox
+            // 
+            this.MaxBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MaxBox.Location = new System.Drawing.Point(87, 115);
+            this.MaxBox.Name = "MaxBox";
+            this.MaxBox.Size = new System.Drawing.Size(121, 20);
+            this.MaxBox.TabIndex = 15;
+            this.MaxBox.Text = "DD-MM-AAAA HH:MM";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.label6.Location = new System.Drawing.Point(12, 89);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(65, 13);
+            this.label6.TabIndex = 12;
+            this.label6.Text = "Fecha Inicio";
+            // 
+            // MinBox
+            // 
+            this.MinBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MinBox.Location = new System.Drawing.Point(87, 86);
+            this.MinBox.Name = "MinBox";
+            this.MinBox.Size = new System.Drawing.Size(121, 20);
+            this.MinBox.TabIndex = 13;
+            this.MinBox.Text = "DD-MM-AAAA HH:MM";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.label4.Location = new System.Drawing.Point(40, 53);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(57, 13);
+            this.label4.TabIndex = 10;
+            this.label4.Text = "Adversario";
+            // 
+            // AdversarioBox
+            // 
+            this.AdversarioBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.AdversarioBox.Location = new System.Drawing.Point(104, 50);
+            this.AdversarioBox.Name = "AdversarioBox";
+            this.AdversarioBox.Size = new System.Drawing.Size(62, 20);
+            this.AdversarioBox.TabIndex = 11;
             // 
             // groupBox4
             // 
@@ -294,9 +434,9 @@
             this.groupBox4.Controls.Add(this.Invitar);
             this.groupBox4.Controls.Add(this.ConectadosGrid);
             this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox4.Location = new System.Drawing.Point(254, 46);
+            this.groupBox4.Location = new System.Drawing.Point(254, 12);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(194, 423);
+            this.groupBox4.Size = new System.Drawing.Size(225, 380);
             this.groupBox4.TabIndex = 12;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Lista Conectados";
@@ -304,7 +444,7 @@
             // Invitar
             // 
             this.Invitar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Invitar.Location = new System.Drawing.Point(59, 390);
+            this.Invitar.Location = new System.Drawing.Point(77, 346);
             this.Invitar.Name = "Invitar";
             this.Invitar.Size = new System.Drawing.Size(75, 23);
             this.Invitar.TabIndex = 12;
@@ -326,15 +466,26 @@
             this.ConectadosGrid.ReadOnly = true;
             this.ConectadosGrid.RowHeadersVisible = false;
             this.ConectadosGrid.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this.ConectadosGrid.Size = new System.Drawing.Size(161, 342);
+            this.ConectadosGrid.Size = new System.Drawing.Size(193, 291);
             this.ConectadosGrid.TabIndex = 11;
             this.ConectadosGrid.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.ConectadosGrid_CellClick);
+            // 
+            // SesionLbl
+            // 
+            this.SesionLbl.AutoSize = true;
+            this.SesionLbl.BackColor = System.Drawing.Color.Silver;
+            this.SesionLbl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.SesionLbl.Location = new System.Drawing.Point(81, 263);
+            this.SesionLbl.Name = "SesionLbl";
+            this.SesionLbl.Size = new System.Drawing.Size(2, 15);
+            this.SesionLbl.TabIndex = 15;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(473, 490);
+            this.ClientSize = new System.Drawing.Size(497, 562);
+            this.Controls.Add(this.SesionLbl);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
@@ -344,6 +495,7 @@
             this.Name = "Form1";
             this.Text = "Cliente";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -353,6 +505,7 @@
             this.groupBox4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ConectadosGrid)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -381,6 +534,18 @@
         private System.Windows.Forms.DataGridView ConectadosGrid;
         private System.Windows.Forms.CheckBox PassCheckBox;
         private System.Windows.Forms.Button Invitar;
+        private System.Windows.Forms.Button EliminarCuenta;
+        private System.Windows.Forms.Button Salir;
+        private System.Windows.Forms.Label SesionLbl;
+        private System.Windows.Forms.RadioButton JugadoresContra;
+        private System.Windows.Forms.RadioButton GanadorAmbos;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox AdversarioBox;
+        private System.Windows.Forms.RadioButton Intervalo;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox MaxBox;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox MinBox;
     }
 }
 

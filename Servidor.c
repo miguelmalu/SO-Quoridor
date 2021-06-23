@@ -106,7 +106,7 @@ void DameConectados (ListaConectados *lista, char conectados[300]) {
 typedef struct {
 	char u_j1 [20]; //Jugador1: Anfitrión
 	int s_j1;
-	char u_j2 [20]; //Jugador2: Initado1
+	char u_j2 [20]; //Jugador2: Invitado1
 	int s_j2;
 	char u_j3 [20];
 	int s_j3;
@@ -117,12 +117,15 @@ typedef struct {
 typedef Partida TablaPartidas [20];
 
 TablaPartidas tabla;
-int invitados; //Está mal, compartido por todos, como mucho se podrí poner detro de los parámetros de partida
+
+//VARIABLES PARA LA CREACIÓN DE PARTIDAS
+int invitados;
 int respuestasinvitaciones;
 int invitadoseliminados;
 
 //FUNCIONES PARA LA TABLA DE PARTIDAS
-void InicializarTabla (TablaPartidas tabla) { //Pone la marca de libre al socket del anfitrión de toda la tabla
+void InicializarTabla (TablaPartidas tabla) {
+	//Pone la marca de libre al socket del anfitrión de toda la tabla
 	//Siendo la tabla un vector, C la pasa automáticament por referencia
 	for (int i=0; i<20; i++) {
 		tabla[i].s_j1 = -1;
@@ -133,6 +136,7 @@ void InicializarTabla (TablaPartidas tabla) { //Pone la marca de libre al socket
 }
 
 int CrearPartida (ListaConectados *lista, char invitados[300], TablaPartidas tabla, int socket) {
+	//Crea un Partida con los parámetros que recibe. Retorna la posición en la tabla, o error si no es posible crearla.
 	int encontrado = 0;
 	int i=0;
 	int pos=0;
@@ -178,6 +182,7 @@ int CrearPartida (ListaConectados *lista, char invitados[300], TablaPartidas tab
 }
 
 int BuscarPosicionPartidaPorJugador (TablaPartidas tabla, char jugador [20]) {
+	//Si existe, devuelve la posición en la tabla del jugador cuyo nombre recibe como parámetro, si no, -1.
 	int encontrado = 0;
 	int i=0;
 	while ((i<20) && ! encontrado) {
@@ -206,6 +211,7 @@ int BuscarPosicionPartidaPorJugador (TablaPartidas tabla, char jugador [20]) {
 }
 
 int BuscarPosicionPartidaPorSocket (TablaPartidas tabla, int socket) {
+	//Si existe, devuelve la posición en la tabla del jugador cuyo socket recibe como parámetro, si no, -1.
 	int encontrado = 0;
 	int i=0;
 	while ((i<20) && ! encontrado) {
@@ -233,19 +239,8 @@ int BuscarPosicionPartidaPorSocket (TablaPartidas tabla, int socket) {
 		return -1;
 }
 
-int EliminarPartida (TablaPartidas tabla, int ID) {
-	strcpy(tabla[ID].u_j1, "");
-	tabla[ID].s_j1 = -1;
-	strcpy(tabla[ID].u_j2, "");
-	tabla[ID].s_j2 = -1;
-	strcpy(tabla[ID].u_j3, "");
-	tabla[ID].s_j3 = -1;
-	strcpy(tabla[ID].u_j4, "");
-	tabla[ID].s_j4 = -1;
-	return 0;
-}
-
 int EliminarJugadorPartida (TablaPartidas tabla, int ID, int socket) {
+	//Elimina de la partida, ID, al jugador cuyo socket recibe como parámetro.
 	if (tabla[ID].s_j1 == socket) {
 		strcpy(tabla[ID].u_j1, "");
 		tabla[ID].s_j1 = -1;
@@ -262,7 +257,21 @@ int EliminarJugadorPartida (TablaPartidas tabla, int ID, int socket) {
 	return 0;
 }
 
+int EliminarPartidaPorID(TablaPartidas tabla, int ID) {
+	//Elimina la partida cuyo ID recibe como parámetro.
+	strcpy(tabla[ID].u_j1, "");
+	tabla[ID].s_j1 = -1;
+	strcpy(tabla[ID].u_j2, "");
+	tabla[ID].s_j2 = -1;
+	strcpy(tabla[ID].u_j3, "");
+	tabla[ID].s_j3 = -1;
+	strcpy(tabla[ID].u_j4, "");
+	tabla[ID].s_j4 = -1;
+	return 0;
+}
+
 int EliminarPartidaPorJugador (TablaPartidas tabla, char jugador [20]) {
+	//Elimina la partida recibiendo el nombre de un jugador como parámetro.
 	int pos = BuscarPosicionPartidaPorJugador (tabla, jugador);
 	if (pos == -1)
 		return -1;
@@ -280,6 +289,7 @@ int EliminarPartidaPorJugador (TablaPartidas tabla, char jugador [20]) {
 }
 
 int EliminarPartidaPorSocket (TablaPartidas tabla, int socket) {
+	//Elimina la partida cuyo socket recibe como parámetro.
 	int pos = BuscarPosicionPartidaPorSocket (tabla, socket);
 	if (pos == -1)
 		return -1;
@@ -296,8 +306,26 @@ int EliminarPartidaPorSocket (TablaPartidas tabla, int socket) {
 	}
 }
 
+void DameJugadores (TablaPartidas tabla, int IDpartida, char jugadores[300]) {
+	//Devuelve el número de jugadores y sus nombres separador por comas, con el ID de la partida como parámetro.
+	int count = 1;
+	if (tabla[IDpartida].s_j2 != -1)
+		count++;
+	if (tabla[IDpartida].s_j3 != -1)
+		count++;
+	if (tabla[IDpartida].s_j4 != -1)
+		count++;
+	sprintf (jugadores, "%d,%s", count, tabla[IDpartida].u_j1);
+	if (count >= 2)
+		sprintf (jugadores, "%s,%s", jugadores, tabla[IDpartida].u_j2);
+	if (count >= 3)
+		sprintf (jugadores, "%s,%s", jugadores, tabla[IDpartida].u_j3);
+	if (count == 4)
+		sprintf (jugadores, "%s,%s", jugadores, tabla[IDpartida].u_j4);
+	printf("FunciónDameJugadores: %s\n", jugadores);
+}
+
 int i=0;
-int sockets[100];
 
 //Estructura necesaria para acceso excluyente
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -347,22 +375,29 @@ void *AtenderCliente (void *socket) {
 		// Ya tenemos el codigo de la peticion
 		printf ("Codigo: %d\n", codigo);
 		int numForm;
-		if (codigo !=0)
+		//No corta en los código que no añaden más parámetros
+		if ((codigo !=0)||(codigo !=14)||(codigo !=15))
 			p = strtok( NULL, "/");
-		if ((codigo==11)||(codigo==12)) {
+		//Saca en numero de form 2, para las consultas desde y hacia allí
+		if ((codigo==11)||(codigo==12)||(codigo==13)) {
 			numForm =  atoi (p);
 			printf ("Form Secundario: %d\n", numForm);
 			p = strtok( NULL, "/");
 		}	
-		
-		
+		//PARÁMETROS QUE RECIBIMOS DEL CLIENTE O LE ENVIAMOS
 		char usuario[20];
 		char contrasena[20];
+		char adversario[20];
+		char min[50];
+		char max[50];
 		char InvitadosPartida[300];
 		char RespuestaInvitados[10];
+		char jugadores[300];
 		char MensajeJugador[100];
-		int JugadaJugador;
+		char JugadaJugador[100];
+		char turnoAct[20];
 		int IDpartida;
+		int IDganadorDentro;
 		
 		if (codigo ==0) { //Peticion de Desconexion
 			Desconectar(sock_conn);
@@ -379,21 +414,38 @@ void *AtenderCliente (void *socket) {
 			int cred = Entrar(usuario,contrasena,respuesta,conn,sock_conn);
 			if (cred == 0)
 				CredencialesCorrectas(usuario,respuesta,sock_conn);
+		} else if (codigo ==14) { //Peticion de Salir
+			Salir(respuesta, sock_conn);
+		} else if (codigo ==15) { //Peticion de EliminarCuenta
+			EliminarCuenta(respuesta,conn,sock_conn);
 		} else if (codigo ==3) { //Peticion de Contraseña
 			strcpy (usuario, p);
 			Contrasena(usuario,respuesta,conn,sock_conn);
-		} else if (codigo ==4) { //Peticion de JugadoresBD
+		} else if (codigo ==4) { //Peticion de JugadoresBDPorID
 			IDpartida = atoi (p);
-			JugadoresBD(IDpartida,respuesta,conn,sock_conn);
+			JugadoresBDPorID(IDpartida,respuesta,conn,sock_conn);
+		} else if (codigo ==16) { //Peticion de JugadoresBDContra
+			strcpy (usuario, p);
+			JugadoresBDContra(usuario,respuesta,conn,sock_conn);
 		} else if (codigo ==5) { //Peticion de Ganador
 			IDpartida = atoi (p);
 			Ganador(IDpartida,respuesta,conn,sock_conn);
 		} else if (codigo ==6) { //Peticion de Tiempo
 			IDpartida = atoi (p);
 			Tiempo(IDpartida,respuesta,conn,sock_conn);
+		} else if (codigo ==18) { //Peticion de IntervaloFecha
+			strcpy (min, p);
+			p = strtok( NULL, "/");
+			strcpy (max, p);
+			IntervaloFecha(min,max,respuesta,conn,sock_conn);
 		} else if (codigo ==7) //Peticion de ganador más rápido
 			Rapido(respuesta,conn,sock_conn);
-		//8 reservado para respuesta a Notificación de Lista Conectados
+		else if (codigo ==17) { //Peticion de GanadorAmbosEnPartida
+			strcpy (usuario, p);
+			p = strtok( NULL, "/");
+			strcpy (adversario, p);
+			GanadorAmbosEnPartida(adversario,usuario,respuesta,conn,sock_conn);
+		} //8 reservado para respuesta a Notificación de Lista Conectados
 		else if (codigo ==9) { //Notificación de Invitar
 			strcpy (InvitadosPartida, p);
 			Invitar(InvitadosPartida,sock_conn);
@@ -401,23 +453,32 @@ void *AtenderCliente (void *socket) {
 			IDpartida = atoi (p);
 			p = strtok( NULL, "/");
 			strcpy (RespuestaInvitados, p);
-			RespuestaInvitacion(RespuestaInvitados,IDpartida,sock_conn);
+			RespuestaInvitacion(RespuestaInvitados,IDpartida,sock_conn,jugadores,conn);
 		} else if (codigo ==11) { //Notificación de Jugada
 			IDpartida = atoi (p);
 			p = strtok( NULL, "/");
-			JugadaJugador = atoi (p);
-			Jugada(JugadaJugador,IDpartida,sock_conn,numForm);
+			strcpy (turnoAct, p);
+			p = strtok( NULL, "/");
+			strcpy (JugadaJugador, p);
+			p = strtok( NULL, "/");
+			IDganadorDentro = atoi (p);
+			Jugada(JugadaJugador,turnoAct,IDpartida,IDganadorDentro,sock_conn,numForm,jugadores,conn);
 		} else if (codigo ==12) { //Notificación de Mesaje
 			IDpartida = atoi (p);
 			p = strtok( NULL, "/");
 			strcpy (MensajeJugador, p);
 			Mensaje(MensajeJugador,IDpartida,sock_conn,numForm);
+		} else if (codigo ==13) { //Notificación de Abandono partida
+			IDpartida = atoi (p);
+			p = strtok( NULL, "/");
+			strcpy (usuario, p);
+			AbandonoPartida(usuario,IDpartida,sock_conn,numForm,jugadores,conn);
 		} else
 			strcpy (respuesta,"Código de petición no válido");
-		
-		if ((codigo==1)||(codigo==2)||(codigo==3)||(codigo==4)||(codigo==5)||(codigo==6)||(codigo==7)) //Enviamos respuesta
+
+		if ((codigo==1)||(codigo==2)||(codigo==3)||(codigo==4)||(codigo==5)||(codigo==6)||(codigo==7)||(codigo==14)||(codigo==15)||(codigo==16)||(codigo==17)||(codigo==18)) //Enviamos respuesta
 			write (sock_conn,respuesta, strlen(respuesta));
-		if ((codigo ==2)||(codigo==0)) //Notificación de Lista Conectados
+		if ((codigo ==2)||(codigo==0)||(codigo==14)||(codigo==15)) //Notificación de Lista Conectados
 			Conectados (respuesta);
 	}
 	mysql_close (conn); //Cerramos MYSQL
@@ -475,13 +536,8 @@ int Registrarse (char usuario[20],char contrasena[20], char respuesta[100],MYSQL
 			else {
 				int ID = atoi (row[0]) +1;
 				printf("%d\n", ID);
-				char IDstr[3];
-				//convertimos la ID en un string y lo concatenamos 
-				sprintf(IDstr, "%d", ID);
-				// Ahora construimos el string con el comando SQL
-				// para insertar la persona en la base. Ese string es:
-				// INSERT INTO Jugador VALUES (ID, 'usuario', 'Contrasena'); 
-				sprintf (consulta, "INSERT INTO Jugador VALUES ('%s','%s','%s')", IDstr, usuario, contrasena);
+				// Ahora construimos el string con el comando SQL para insertar la persona en la base
+				sprintf (consulta, "INSERT INTO Jugador VALUES (%d,'%s','%s')", ID, usuario, contrasena);
 				printf("%s\n", consulta);
 				// Ahora ya podemos realizar la insercion 
 				err = mysql_query(conn, consulta);
@@ -517,7 +573,7 @@ int Entrar (char usuario[20],char contrasena[20], char respuesta[100],MYSQL *con
 		exit (1);
 	}
 	//recogemos el resultado de la consulta 
-		resultado = mysql_store_result (conn);
+	resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
 	if (row == NULL)
 	{
@@ -532,6 +588,7 @@ int Entrar (char usuario[20],char contrasena[20], char respuesta[100],MYSQL *con
 	}
 }
 int CredencialesCorrectas (char usuario[20], char respuesta[100], int sock_conn) {
+	//Revisar si las credenciales son correctas, cuando se solicita Entrar.
 	int pos = DamePosicionPorSocket (&lista, sock_conn);
 	if (pos != -1) {
 		printf("En este cliente ya se había iniciado sesión con otro usuario.\n");
@@ -566,8 +623,63 @@ int CredencialesCorrectas (char usuario[20], char respuesta[100], int sock_conn)
 	}
 	printf("%s\n", respuesta);
 }
+int Salir (char respuesta[100],int sock_conn){
+	//Función para Salir
+	//Borramos el cliente de la lista
+	printf ("Socket: %d\n", sock_conn); //Debug
+	pthread_mutex_lock(&mutex); //No me interrumpas ahora
+	int res = EliminaPorSocket(&lista,sock_conn);
+	pthread_mutex_unlock(&mutex); //ya puedes interrumpirme
+	if (res == 0) {
+		printf ("Se ha cerrado sesión\n");
+		strcpy(respuesta, "14/1");
+		return 1;
+	} else if (res == -1) {
+		printf ("No se había iniciado sesión\n");
+		strcpy(respuesta, "14/-1");
+		return -1;
+	}
+}
+int EliminarCuenta (char respuesta[100],MYSQL *conn,int sock_conn){
+	//Función para EliminarCuenta de la BD
+	int pos = DamePosicionPorSocket(&lista, sock_conn);
+	if (pos == -1) {
+		printf ("No se había iniciado sesión\n");
+		strcpy(respuesta, "15/-1");
+		return -1;
+	} else {
+		char usuario[20];
+		strcpy(usuario, lista.conectados[pos].nombre);
+		MYSQL_RES *resultado;
+		MYSQL_ROW row;
+		char consulta[100];
+		sprintf (consulta, "DELETE FROM Jugador WHERE Jugador.Usuario = '%s'", usuario);
+		//Consulta: Eliminar Jugador de la BD a partir de su Usuario
+		int err=mysql_query (conn, consulta);
+		if (err!=0) {
+			printf ("Error al consultar datos de la base %u %s\n",
+					mysql_errno(conn), mysql_error(conn));
+			strcpy(respuesta, "15/-2");
+			exit (1);
+		} else {
+			//Cerramos sesión
+			int res = Salir(respuesta, sock_conn);
+			if (res == 1) {
+				printf ("Se ha cerrado sesión y eliminado el usuario\n");
+				strcpy(respuesta, "15/1");
+				return 1;
+			} else if (res == -1) {
+				printf ("Se ha eliminado el usuario, pero no cerrar sesión\n");
+				strcpy(respuesta, "15/-3");
+				return -3;
+			}
+		}
+	}
+}
+
+
 void Contrasena (char usuario[20], char respuesta[100],MYSQL *conn,int sock_conn){
-	//Procedimiento para devolver la contrasena
+	//Procedimiento para devolver la contrasena de la BD a partir del nombre de usuario
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
 	char consulta[100];
@@ -590,8 +702,8 @@ void Contrasena (char usuario[20], char respuesta[100],MYSQL *conn,int sock_conn
 		printf("%s\n", respuesta);
 	}
 }
-void JugadoresBD (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
-	//Procedimiento para devolver los jugadores de una partida
+void JugadoresBDPorID (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
+	//Procedimiento para devolver los jugadores de una partida, de la BD
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
 	char consulta[200];
@@ -619,8 +731,37 @@ void JugadoresBD (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
 		printf("%s\n", respuesta);
 	}
 }
+void JugadoresBDContra (char usuario[20], char respuesta[100],MYSQL *conn,int sock_conn){
+	//Procedimiento para devolver los jugadores contra los que he jugado, de la BD
+	MYSQL_RES *resultado;
+	MYSQL_ROW row;
+	char consulta[900];
+	sprintf (consulta, "SELECT DISTINCT Jugador.Usuario FROM (Jugador, Partida, Jugadores) WHERE Partida.ID IN (SELECT Partida.ID FROM (Jugador, Partida, Jugadores) WHERE Jugador.Usuario = '%s' AND Jugador.ID = Jugadores.ID_J AND Partida.ID = Jugadores.ID_P) AND Jugador.ID = Jugadores.ID_J AND Partida.ID = Jugadores.ID_P AND Jugador.Usuario != '%s'", usuario, usuario);
+	//Consulta: Buscar los jugadores de una partida a partir del identificador
+	int err=mysql_query (conn, consulta);
+	if (err!=0) {
+		printf ("Error al consultar datos de la base %u %s\n",
+				mysql_errno(conn), mysql_error(conn));
+		exit (1);
+	}
+	//recogemos el resultado de la consulta 
+	resultado = mysql_store_result (conn);
+	row = mysql_fetch_row (resultado);
+	if (row == NULL) {
+		printf ("No se han obtenido datos en la consulta\n");
+		strcpy(respuesta, "16/fail");
+	} else {
+		strcpy(respuesta, "16/");
+		while (row !=NULL) {
+			printf("%s\n", row[0]);
+			sprintf(respuesta, "%s%s/", respuesta, row[0]);
+			row = mysql_fetch_row (resultado);
+		}
+		printf("%s\n", respuesta);
+	}
+}
 void Ganador (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
-	//Procedimiento para devolver el ganador de una partida
+	//Procedimiento para devolver el ganador de una partida cuyo ID se recibe como parametro, en la BD
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
 	char consulta[100];
@@ -644,7 +785,7 @@ void Ganador (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
 	}
 }
 void Tiempo (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
-	//Procedimiento para devolver la duración de una partida
+	//Procedimiento para devolver la duración de una partida cuyo ID se recibe como parametro, de la BD
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
 	char consulta[100];
@@ -668,6 +809,76 @@ void Tiempo (int partida, char respuesta[100],MYSQL *conn,int sock_conn){
 		printf("%s\n", respuesta);
 	}
 }
+void IntervaloFecha (char min[50], char max[50], char respuesta[100],MYSQL *conn,int sock_conn){
+	//Procedimiento para devolver las partidas en un intervalo de tiempo, de la BD
+	MYSQL_RES *resultado;
+	MYSQL_ROW row;
+	char consulta[100];
+	sprintf (consulta, "SELECT Partida.ID, Partida.Fecha FROM Partida");
+	//Consulta: Buscar la duración de una partida a partir del identificador
+	int err=mysql_query (conn, consulta);
+	if (err!=0) {
+		printf ("Error al consultar datos de la base %u %s\n",
+				mysql_errno(conn), mysql_error(conn));
+		exit (1);
+	}
+	//recogemos el resultado de la consulta 
+	resultado = mysql_store_result (conn);
+	row = mysql_fetch_row (resultado);
+	if (row == NULL) {
+		printf ("No se han obtenido datos en la consulta\n");
+		strcpy(respuesta, "18/fail");
+	} else {
+		strcpy(respuesta, "18/");
+		//Fecha inicio
+		char *p = strtok( min, "-");
+		int DiaMin = atoi(p);
+		p = strtok( NULL, "-");
+		int MesMin = atoi(p);
+		p = strtok( NULL, " ");
+		int AnoMin = atoi(p);
+		p = strtok( NULL, ":");
+		int HoraMin = atoi(p);
+		p = strtok( NULL, "");
+		int MinutoMin = atoi(p);
+		//Fecha fin
+		p = strtok( max, "-");
+		int DiaMax = atoi(p);
+		p = strtok( NULL, "-");
+		int MesMax = atoi(p);
+		p = strtok( NULL, " ");
+		int AnoMax = atoi(p);
+		p = strtok( NULL, ":");
+		int HoraMax = atoi(p);
+		p = strtok( NULL, "");
+		int MinutoMax = atoi(p);
+		//Fecha BD
+		char Fecha[100];
+		strcpy(Fecha,row[1]);
+		while (row !=NULL) {
+			//Fecha partida
+			int ID = atoi(row[0]);
+			char *p = strtok( row[1], "-");
+			int Dia = atoi(p);
+			p = strtok( NULL, "-");
+			int Mes = atoi(p);
+			p = strtok( NULL, " ");
+			int Ano = atoi(p);
+			p = strtok( NULL, ":");
+			int Hora = atoi(p);
+			p = strtok( NULL, "");
+			int Minuto = atoi(p);
+			if ((AnoMin <= Ano) && (Ano <= AnoMax))
+				if ((MesMin <= Mes) && (Mes <= MesMax))
+					if ((DiaMin <= Dia) && (Dia <= DiaMax))
+						if ((HoraMin <= Hora) && (Hora <= HoraMax))
+							if ((MinutoMin <= Minuto) && (Minuto <= MinutoMax))
+								sprintf(respuesta, "%s%d/%s/", respuesta, ID, Fecha);
+			row = mysql_fetch_row (resultado);
+		}
+		printf("%s\n", respuesta);
+	}
+}
 void Rapido (char respuesta[100],MYSQL *conn,int sock_conn){
 	//Procedimiento para devolver el ganador mas rápido de una partida
 	MYSQL_RES *resultado;
@@ -687,6 +898,37 @@ void Rapido (char respuesta[100],MYSQL *conn,int sock_conn){
 		strcpy(respuesta, "7/fail");
 	} else {
 		sprintf(respuesta, "7/%s", row[0]);
+		printf("%s\n", respuesta);
+	}
+}
+
+void GanadorAmbosEnPartida (char adversario[20], char usuario[20], char respuesta[512],MYSQL *conn,int sock_conn){
+	//Procedimiento para devolver los ganadores de las partidas en los que ha jugado tanto el usuario como un determinado adversario, de la BD
+	MYSQL_RES *resultado;
+	MYSQL_ROW row;
+	char consulta[900];
+	sprintf (consulta, "SELECT DISTINCT Partida.ID, Partida.Ganador FROM (Jugador, Partida, Jugadores) WHERE Jugador.Usuario = '%s' AND Partida.ID IN (SELECT Partida.ID FROM (Jugador, Partida, Jugadores) WHERE Jugador.Usuario = '%s' AND Jugador.ID = Jugadores.ID_J AND Partida.ID = Jugadores.ID_P) AND Jugador.ID = Jugadores.ID_J AND Partida.ID = Jugadores.ID_P",
+			 adversario, usuario);
+	//Consulta: Buscar los jugadores de una partida a partir del identificador
+	int err=mysql_query (conn, consulta);
+	if (err!=0) {
+		printf ("Error al consultar datos de la base %u %s\n",
+				mysql_errno(conn), mysql_error(conn));
+		exit (1);
+	}
+	//recogemos el resultado de la consulta 
+	resultado = mysql_store_result (conn);
+	row = mysql_fetch_row (resultado);
+	if (row == NULL) {
+		printf ("No se han obtenido datos en la consulta\n");
+		strcpy(respuesta, "17/fail");
+	} else {
+		strcpy(respuesta, "17/");
+		while (row !=NULL) {
+			int ID = atoi(row[0]);
+			sprintf(respuesta, "%s%d/%s/", respuesta, ID, row[1]);
+			row = mysql_fetch_row (resultado);
+		}
 		printf("%s\n", respuesta);
 	}
 }
@@ -733,7 +975,7 @@ void Invitar (char InvitadosPartida[300],int socket) {
 	}
 }
 
-void RespuestaInvitacion (char RespuestaInvitados[10],int IDpartida,int socket) {
+void RespuestaInvitacion (char RespuestaInvitados[10],int IDpartida,int socket, char jugadores[300]) {
 	//Notifica a los participantes si la partida se inicia o no
 	char notificacion[512];
 	int res =0;
@@ -766,9 +1008,11 @@ void RespuestaInvitacion (char RespuestaInvitados[10],int IDpartida,int socket) 
 	if (respuestasinvitaciones == invitados) {
 		int op = invitados-invitadoseliminados;
 		printf("op: %d\n", op);
-		if (op > 0)
-			sprintf(notificacion,"10/%d/TRUE",IDpartida);
-		else
+		if (op > 0) {
+			DameJugadores(tabla,IDpartida,jugadores);
+			printf("Jugadores: %s\n", jugadores);
+			sprintf(notificacion,"10/%d/TRUE/%s",IDpartida,jugadores);
+		} else
 			sprintf(notificacion,"10/%d/FALSE",IDpartida);
 		
 		printf("Notificacion: %s\n", notificacion);
@@ -786,22 +1030,38 @@ void RespuestaInvitacion (char RespuestaInvitados[10],int IDpartida,int socket) 
 	}
 }
 
-void Jugada (int JugadaJugador, int IDpartida, int socket, int numForm) {
-	//Enviamos la Jugada como notificación
+void Jugada (char JugadaJugador[100], char turnoAct[20], int IDpartida, int IDganadorDentro, int socket, int numForm, char jugadores[300], MYSQL *conn) {
+	//Enviamos la Jugada como notificación, tambien si hay, la partida se acaba y se guarda
+	printf("JugadaJugador: %s\n",JugadaJugador); //Debug
+	printf("turnoAct: %s\n",turnoAct); //Debug
+	printf("SocketRecibido: %d\n",socket); //Debug
+	printf("IDganadorDentro: %d\n",IDganadorDentro); //Debug
 	char notificacion[512];
-	sprintf (notificacion, "11/%d/%d/%d", numForm, IDpartida, JugadaJugador);
-	if (tabla[IDpartida].s_j1 != (socket || -1)) //Se tiene que cambiar, igual que abajo
+	sprintf (notificacion, "11/%d/%d/%s,%s,%d", numForm, IDpartida, turnoAct, JugadaJugador, IDganadorDentro);
+	if (tabla[IDpartida].s_j1 != socket)
 		write (tabla[IDpartida].s_j1, notificacion, strlen(notificacion));
-	if (tabla[IDpartida].s_j2 != (socket || -1))
+	if (tabla[IDpartida].s_j2 != socket)
 		write (tabla[IDpartida].s_j2, notificacion, strlen(notificacion));
-	if (tabla[IDpartida].s_j3 != (socket || -1))
+	if (tabla[IDpartida].s_j3 != socket)
 		write (tabla[IDpartida].s_j3, notificacion, strlen(notificacion));
-	if (tabla[IDpartida].s_j4 != (socket || -1))
+	if (tabla[IDpartida].s_j4 != socket)
 		write (tabla[IDpartida].s_j4, notificacion, strlen(notificacion));
+	if (IDganadorDentro != -1) {
+		char usuario[20];
+		UsuarioPorIDjugadorDentro (IDganadorDentro,IDpartida,usuario);
+		int res = GuardarPartidaBD(IDpartida,usuario,jugadores,conn);
+		if (res == 0) {
+			pthread_mutex_lock(&mutex);
+			EliminarPartidaPorID(tabla,IDpartida);
+			pthread_mutex_unlock(&mutex);
+			printf("Partida eliminada\n");
+		} else
+			printf("No se ha podido guardar la partida en la BD\n");
+	}
 }
 
 void Mensaje (char MensajeJugador[100], int IDpartida, int socket, int numForm) {
-	//Enviamos la Jugada como notificación
+	//Enviamos en Mensaje como notificación
 	printf("MensajeJugador: %s\n",MensajeJugador); //Debug
 	printf("SocketRecibido: %d\n",socket); //Debug
 	char notificacion[512];
@@ -822,6 +1082,124 @@ void Mensaje (char MensajeJugador[100], int IDpartida, int socket, int numForm) 
 		write (tabla[IDpartida].s_j4, notificacion, strlen(notificacion));
 }
 
+void AbandonoPartida (char usuario[20], int IDpartida, int socket, int numForm, char jugadores[300], MYSQL *conn) {
+	//Enviamos el Abandono Partida como notificación, la partida se acaba y se guarda
+	printf("Jugador que ha abadonado: %s\n",usuario); //Debug
+	printf("SocketRecibido: %d\n",socket); //Debug
+	char notificacion[512];
+	sprintf (notificacion, "13/%d/%d/%s", numForm, IDpartida, usuario);
+	if (tabla[IDpartida].s_j1 != socket)
+		write (tabla[IDpartida].s_j1, notificacion, strlen(notificacion));
+	if (tabla[IDpartida].s_j2 != socket)
+		write (tabla[IDpartida].s_j2, notificacion, strlen(notificacion));
+	if (tabla[IDpartida].s_j3 != socket)
+		write (tabla[IDpartida].s_j3, notificacion, strlen(notificacion));
+	if (tabla[IDpartida].s_j4 != socket)
+		write (tabla[IDpartida].s_j4, notificacion, strlen(notificacion));
+	int res = GuardarPartidaBD(IDpartida,"Empate",jugadores,conn);
+	if (res == 0) {
+		pthread_mutex_lock(&mutex);
+		EliminarPartidaPorID(tabla,IDpartida);
+		pthread_mutex_unlock(&mutex);
+		printf("Partida eliminada\n");
+	} else
+		printf("No se ha podido guardar la partida en la BD\n");
+}
+
+void UsuarioPorIDjugadorDentro (int IDjugadorPartida, int IDpartida, char usuario[20]) {
+	if (IDjugadorPartida == 1)
+		strcpy(usuario, tabla[IDpartida].u_j1);
+	else if (IDjugadorPartida == 2)
+		strcpy(usuario, tabla[IDpartida].u_j2);
+	else if (IDjugadorPartida == 3)
+		strcpy(usuario, tabla[IDpartida].u_j3);
+	else if (IDjugadorPartida == 4)
+		strcpy(usuario, tabla[IDpartida].u_j4);
+}
+
+int GuardarPartidaBD (int IDpartida, char ganador[20], char jugadores[300], MYSQL *conn) {
+	//Funcion para Guardar una partida, en la BD
+	MYSQL_RES *resultado;
+	MYSQL_ROW row;
+	char consulta[500];
+	sprintf (consulta, "SELECT MAX(Partida.ID) FROM Partida");
+	//Consulta: Busca un ID de partida disponible
+	int err=mysql_query (conn, consulta);
+	if (err!=0) {
+		printf ("Error al consultar datos de la base %u %s\n",
+				mysql_errno(conn), mysql_error(conn));
+		exit (1);
+	}
+	//recogemos el resultado de la consulta 
+	resultado = mysql_store_result (conn);
+	row = mysql_fetch_row (resultado);
+	if (row == NULL)
+		printf ("No se han obtenido datos en la consulta\n");
+	else {
+		int ID = atoi (row[0]) +1;
+		printf("%d\n", ID);
+		char fecha[150];
+		time_t tiempo = time(0);
+		struct tm *tlocal=localtime(&tiempo);
+		strftime(fecha,150,"%d-%m-20%y %H:%M",tlocal);
+		//Ahora construimos el string con el comando SQL para insertar la partida en la base
+		sprintf (consulta, "INSERT INTO Partida VALUES (%d,'%s',NULL,'%s')", ID, fecha, ganador);
+		printf("%s\n", consulta);
+		//Ahora ya podemos realizar la insercion 
+		err = mysql_query(conn, consulta);
+		if (err!=0) {
+			printf ("Error al introducir datos la base %u %s\n", 
+					mysql_errno(conn), mysql_error(conn));
+			exit (1);
+		} else {
+			printf("Se ha añadido la PARTIDA correctamente\n");
+			DameJugadores(tabla,IDpartida,jugadores);
+			char *p = strtok( jugadores, ",");
+			int numJug = atoi(p);
+			printf("numJug: %d\n", numJug);
+			p = strtok( NULL, ",");
+			int cont = 0;
+			while (p != NULL) {
+				//Consulta: Buscar el ID a partir del nombre de usuario
+				sprintf (consulta, "SELECT Jugador.ID FROM Jugador WHERE Jugador.Usuario = '%s'", p);
+				int err=mysql_query (conn, consulta);
+				if (err!=0) {
+					printf ("Error al consultar datos de la base %u %s\n",
+							mysql_errno(conn), mysql_error(conn));
+					exit (1);
+				}
+				resultado = mysql_store_result (conn);
+				row = mysql_fetch_row (resultado);
+				if (row == NULL) {
+					printf ("No se han obtenido datos en la consulta\n");
+				} else {
+					int IDjugadorBD = atoi(row[0]);
+					printf("IDjugadorBD: %d\n", IDjugadorBD);
+					//Ahora construimos el string con el comando SQL para relacionar las tablas
+					sprintf (consulta, "INSERT INTO Jugadores VALUES (%d,%d)",IDjugadorBD, ID);
+					printf("%s\n", consulta);
+					//Ahora ya podemos realizar la insercion 
+					err = mysql_query(conn, consulta);
+					if (err!=0) {
+						printf ("Error al introducir datos la base %u %s\n", 
+								mysql_errno(conn), mysql_error(conn));
+						exit (1);
+					} else {
+						printf("Se ha añadido la relación correctamente\n");
+						p = strtok( NULL, ",");
+						cont++;
+					}
+				}
+				if (numJug == cont) {
+					printf("Se ha añadido la PARTIDA con sus relaciones correctamente\n");
+					return 0;
+				}
+			}
+		}
+	}
+}
+	
+//FUNCIÓN PRINCIPAL
 int main(int argc, char *argv[]) {
 	int sock_conn, sock_listen;
 	struct sockaddr_in serv_adr;
@@ -837,7 +1215,7 @@ int main(int argc, char *argv[]) {
 	//htonl formatea el numero que recibe al formato necesario
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	// establecemos el puerto de escucha
-	//int puerto = 9046; //Entorno Desarrollo
+	//int puerto = 9036; //Entorno Desarrollo
 	int puerto = 50057; //Entorno Producción
 	serv_adr.sin_port = htons(puerto);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0) {
@@ -861,11 +1239,11 @@ int main(int argc, char *argv[]) {
 		sock_conn = accept(sock_listen, NULL, NULL);
 		printf ("He recibido conexion\n");
 		
-		sockets[i] =sock_conn;
+		lista.conectados[i].socket =sock_conn;
 		//sock_conn es el socket que usaremos para este cliente
 		
 		// Crear thead y decirle lo que tiene que hacer
-		pthread_create (&thread, NULL, AtenderCliente,&sockets[i]);
+		pthread_create (&thread, NULL, AtenderCliente,&lista.conectados[i].socket);
 		i++;
 	}	
 }
