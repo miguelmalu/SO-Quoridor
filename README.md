@@ -23,4 +23,8 @@
 ### Versión 5
 	Protección Cross-Threading y Múltiples Formularios
 - **Generada** por Miguel  
-- **Verificada** por Maria   
+- **Verificada** por Maria y Freddy  
+- [**Comunicada** por Esther](https://drive.google.com/file/d/1gpPuGYD0VOpyqz613Hc9EhHEouk2Oko7/view?usp=sharing)
+### Versión Final
+	Implementación del juego y mejoras varias
+- **Generada** por Maria  
