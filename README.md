@@ -29,3 +29,4 @@
 	Implementación del juego y mejoras varias
 - **Generada** por Maria  
 - **Verificada** por Miguel  
+- [**Comunicada** por Esther](https://drive.google.com/file/d/1J-MKuag-H-uYQqApYrfMgbz3xVGjs-yC/view?usp=sharing)
